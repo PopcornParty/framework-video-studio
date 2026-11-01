@@ -2,6 +2,7 @@ import { openDB, DBSchema, IDBPDatabase } from 'idb'
 import { normalizeTag } from './tags'
 import type { Research } from './research'
 import type { StorytellingState } from './storytelling/types'
+import type { DnaPackage } from './dna/types'
 
 export interface Asset {
   id: string
@@ -80,6 +81,9 @@ export interface Production {
   createdAt: number
   updatedAt: number
   outputBlob?: Blob
+  dna?: DnaPackage
+  dnaFingerprint?: string
+  dnaImportedAt?: number
 }
 
 export interface TagRecord {
