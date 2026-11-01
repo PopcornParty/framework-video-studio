@@ -20,6 +20,7 @@ export default function ResearchPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [production, setProduction] = useState<Production | null>(null)
+  const [notFound, setNotFound] = useState(false)
   const [label, setLabel] = useState('')
   const [rawText, setRawText] = useState('')
   const [publishedAt, setPublishedAt] = useState('')
@@ -31,9 +32,13 @@ export default function ResearchPage() {
         const p = await getProduction(id)
         if (p) {
           setProduction(p)
+          setNotFound(false)
           setLoading(false)
           return
         }
+        setNotFound(true)
+        setLoading(false)
+        return
       }
       const newId = await getNextProductionId()
       const now = Date.now()
@@ -104,7 +109,19 @@ export default function ResearchPage() {
     setProduction(updated)
   }
 
-  if (loading || !production) return <div className="p-4">Loading...</div>
+  if (loading) return <div className="p-4">Loading...</div>
+  if (notFound) {
+    return (
+      <div className="p-4 space-y-3">
+        <h2 className="text-2xl font-semibold">Production not found</h2>
+        <p className="text-sm text-gray-400">No production matches this ID. Nothing was created or overwritten.</p>
+        <button onClick={() => navigate('/productions')} className="text-sm bg-blue-600 text-white px-3 py-2 rounded-lg">
+          Back to projects
+        </button>
+      </div>
+    )
+  }
+  if (!production) return <div className="p-4">Loading...</div>
 
   const research = production.research
   const approved = research ? approvedFacts(research.facts) : []
@@ -139,7 +156,7 @@ export default function ResearchPage() {
         <button
           onClick={addSource}
           disabled={!rawText.trim()}
-          className="w-full bg-blue-600 disabled:opacity-50 text-white py-2 rounded-lg text-sm"
+          className="w-full bg-blue-600 disabled:opacity-50 text-white py-3 rounded-lg text-sm"
         >
           Add source and extract facts
         </button>
@@ -186,12 +203,12 @@ export default function ResearchPage() {
                 <div className="flex flex-wrap gap-2 mt-2">
                   <button
                     onClick={() => toggleApproved(f.id, f.approvedForScript)}
-                    className={`text-xs px-2 py-1 rounded ${f.approvedForScript ? 'bg-green-700 text-white' : 'border border-dark-border'}`}
+                    className={`text-xs px-3 py-2 rounded min-h-[36px] ${f.approvedForScript ? 'bg-green-700 text-white' : 'border border-dark-border'}`}
                   >
                     {f.approvedForScript ? 'Approved' : 'Approve for script'}
                   </button>
                   <select
-                    className="text-xs bg-dark-bg border border-dark-border rounded px-2 py-1"
+                    className="text-xs bg-dark-bg border border-dark-border rounded px-2 py-2 min-h-[36px]"
                     value={f.verificationStatus}
                     onChange={e => changeVerification(f.id, e.target.value as VerificationStatus)}
                   >
@@ -214,7 +231,7 @@ export default function ResearchPage() {
 
       <button
         onClick={() => navigate(`/structure/${production.id}`)}
-        className="w-full bg-blue-600 text-white py-2 rounded-lg text-sm"
+        className="w-full bg-blue-600 text-white py-3 rounded-lg text-sm"
       >
         Continue to story structure
       </button>
