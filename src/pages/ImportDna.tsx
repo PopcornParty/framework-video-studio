@@ -2,11 +2,30 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getAllProductions, getNextProductionId, saveProduction, Production } from '../lib/db'
 import { decodeDna } from '../lib/dna/decode'
+import { matchUserMedia, DroppedFile } from '../lib/dna/match'
 import type { DnaPackage } from '../lib/dna/types'
+
+async function hashFile(file: File): Promise<string> {
+  const buf = await file.arrayBuffer()
+  const digest = await crypto.subtle.digest('SHA-256', buf)
+  return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16)
+}
+
+async function toDropped(file: File): Promise<DroppedFile> {
+  let readable = true
+  let hash = ''
+  try {
+    hash = await hashFile(file)
+  } catch {
+    readable = false
+  }
+  return { name: file.name, size: file.size, type: file.type, hash, readable }
+}
 
 export default function ImportDna() {
   const navigate = useNavigate()
   const [raw, setRaw] = useState('')
+  const [files, setFiles] = useState<File[]>([])
   const [errors, setErrors] = useState<string[]>([])
   const [warnings, setWarnings] = useState<string[]>([])
   const [busy, setBusy] = useState(false)
@@ -22,12 +41,23 @@ export default function ImportDna() {
       return
     }
 
+    const userVisuals = (result.dna.visuals || []).filter(v => v.origin === 'user-provided')
+    const dropped = await Promise.all(files.map(toDropped))
+    const match = matchUserMedia(result.dna.visuals || [], dropped)
+    if (!match.ok) {
+      setErrors(match.errors)
+      setWarnings(match.warnings)
+      setBusy(false)
+      return
+    }
+
     const existing = await getAllProductions()
     const dup = existing.find(p => p.dnaFingerprint === result.fingerprint)
     if (dup) {
       setWarnings([
         `This DNA was already imported as ${dup.id}. Opened the existing production. Nothing was overwritten.`,
         ...result.warnings,
+        ...match.warnings,
       ])
       setBusy(false)
       navigate(`/research/${dup.id}`)
@@ -89,9 +119,19 @@ export default function ImportDna() {
       dna: dna as DnaPackage,
       dnaFingerprint: result.fingerprint,
       dnaImportedAt: now,
+      userMedia: match.matched.map(m => {
+        const file = files.find(f => f.name === m.filename && f.size === m.size)
+        return { ...m, blob: file }
+      }),
     }
     await saveProduction(prod)
-    setWarnings(result.warnings)
+    setWarnings([
+      ...result.warnings,
+      ...match.warnings,
+      userVisuals.length
+        ? `Matched ${match.matched.length} user file(s). No download or render was performed.`
+        : 'No user media in this DNA.',
+    ])
     setBusy(false)
     navigate(`/research/${id}`)
   }
@@ -100,14 +140,27 @@ export default function ImportDna() {
     <div className="p-4 space-y-4">
       <h2 className="text-2xl font-semibold">Import DNA</h2>
       <p className="text-xs text-gray-500">
-        Paste a FRAMEWORK DNA v1 package. This validates and stores the plan. It does not download assets or render a video.
+        Paste DNA. If ChatGPT selected your uploads, drop those same files below. No renaming. This does not download external assets or render a video.
       </p>
       <textarea
-        className="w-full h-64 bg-dark-card border border-dark-border rounded-lg p-3 text-xs font-mono"
+        className="w-full h-48 bg-dark-card border border-dark-border rounded-lg p-3 text-xs font-mono"
         placeholder="---FRAMEWORK DNA v1---"
         value={raw}
         onChange={e => setRaw(e.target.value)}
       />
+      <label className="block border border-dashed border-dark-border rounded-lg p-4 text-sm text-center">
+        Drop user files (optional)
+        <input
+          type="file"
+          multiple
+          accept="image/*,video/*"
+          className="block w-full mt-2 text-xs"
+          onChange={e => setFiles(Array.from(e.target.files || []))}
+        />
+      </label>
+      {files.length > 0 && (
+        <p className="text-xs text-gray-400">{files.length} file(s) ready. Unused files are ignored.</p>
+      )}
       <button
         onClick={importDna}
         disabled={busy || !raw.trim()}
@@ -117,13 +170,13 @@ export default function ImportDna() {
       </button>
       {errors.length > 0 && (
         <div className="bg-red-900/30 border border-red-700 rounded-lg p-3">
-          <p className="text-sm text-red-300">Import failed. Nothing was saved.</p>
+          <p className="text-sm text-red-300">Import stopped. Nothing was saved.</p>
           <ul className="text-xs text-red-200 mt-2 list-disc pl-4">
             {errors.map((e, i) => <li key={i}>{e}</li>)}
           </ul>
         </div>
       )}
-      {warnings.length > 0 && errors.length === 0 && (
+      {warnings.length > 0 && (
         <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-3">
           <ul className="text-xs text-yellow-100 list-disc pl-4">
             {warnings.map((w, i) => <li key={i}>{w}</li>)}
