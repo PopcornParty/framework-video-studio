@@ -78,6 +78,10 @@ export default function StoryStructurePage() {
 
   async function overrideHook(hookId: string) {
     if (!production?.storytelling) return
+    const facts = production.research ? approvedFacts(production.research.facts) : []
+    const hasVerified = facts.some(f => f.verificationStatus === 'verified')
+    const hook = HOOKS.find(h => h.id === hookId)
+    if (hook?.requiresVerifiedFact && !hasVerified) return
     const state: StorytellingState = {
       ...production.storytelling,
       selectedHookId: hookId,
@@ -93,8 +97,11 @@ export default function StoryStructurePage() {
 
   const st = production.storytelling
   const selected = st ? getStructure(st.selectedStructureId) : undefined
+  const selectedHook = st ? HOOKS.find(h => h.id === st.selectedHookId) : undefined
   const duration = production.interpretedIntent?.duration || 30
   const pacing = duration < 20 ? PACING_NOTES.short : duration <= 45 ? PACING_NOTES.medium : PACING_NOTES.long
+  const facts = production.research ? approvedFacts(production.research.facts) : []
+  const hasVerified = facts.some(f => f.verificationStatus === 'verified')
 
   return (
     <div className="p-4 space-y-4">
@@ -111,9 +118,9 @@ export default function StoryStructurePage() {
       {st && (
         <>
           <div className="bg-dark-card border border-dark-border rounded-lg p-3">
-            <p className="text-sm">Recommended: <span className="font-medium">{getStructure(st.recommendedStructureId)?.name}</span></p>
+            <p className="text-sm">Recommended structure: <span className="font-medium">{getStructure(st.recommendedStructureId)?.name}</span></p>
             <p className="text-xs text-gray-400 mt-1">{st.reason}</p>
-            {st.userOverride && <p className="text-xs text-blue-400 mt-1">You overrode the recommendation.</p>}
+            {st.userOverride && <p className="text-xs text-blue-400 mt-1">You overrode the structure recommendation.</p>}
           </div>
 
           <div>
@@ -136,10 +143,24 @@ export default function StoryStructurePage() {
               value={st.selectedHookId}
               onChange={e => overrideHook(e.target.value)}
             >
-              {HOOKS.map(h => (
-                <option key={h.id} value={h.id}>{h.name}</option>
-              ))}
+              {HOOKS.map(h => {
+                const disabled = h.requiresVerifiedFact && !hasVerified
+                return (
+                  <option key={h.id} value={h.id} disabled={disabled}>
+                    {h.name}{disabled ? ' (needs verified fact)' : ''}
+                  </option>
+                )
+              })}
             </select>
+            {selectedHook && (
+              <div className="mt-2 bg-dark-bg border border-dark-border rounded-lg p-2">
+                <p className="text-sm font-medium">Selected hook: {selectedHook.name}</p>
+                <p className="text-xs text-gray-400 mt-1">{selectedHook.description}</p>
+                {st.selectedHookId !== st.recommendedHookId && (
+                  <p className="text-xs text-blue-400 mt-1">You overrode the hook recommendation.</p>
+                )}
+              </div>
+            )}
           </div>
 
           {selected && (
