@@ -7,6 +7,7 @@ import StoryboardEditor from './pages/StoryboardEditor'
 import Productions from './pages/Productions'
 import SettingsPage from './pages/Settings'
 import ResearchPage from './pages/Research'
+import StoryStructurePage from './pages/StoryStructure'
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/create" element={<CreateVideo />} />
             <Route path="/research/:id?" element={<ResearchPage />} />
+            <Route path="/structure/:id" element={<StoryStructurePage />} />
             <Route path="/library" element={<MediaLibrary />} />
             <Route path="/storyboard/:id?" element={<StoryboardEditor />} />
             <Route path="/productions" element={<Productions />} />
