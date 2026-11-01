@@ -6,6 +6,7 @@ import MediaLibrary from './pages/MediaLibrary'
 import StoryboardEditor from './pages/StoryboardEditor'
 import Productions from './pages/Productions'
 import SettingsPage from './pages/Settings'
+import ResearchPage from './pages/Research'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/create" element={<CreateVideo />} />
+            <Route path="/research/:id?" element={<ResearchPage />} />
             <Route path="/library" element={<MediaLibrary />} />
             <Route path="/storyboard/:id?" element={<StoryboardEditor />} />
             <Route path="/productions" element={<Productions />} />
