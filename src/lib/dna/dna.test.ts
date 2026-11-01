@@ -112,10 +112,14 @@ describe('decodeDna', () => {
     expect(r.ok).toBe(false)
   })
 
-  it('rejects forbidden keys', async () => {
-    const bad = { ...base, __proto__: { admin: true } }
-    const r = await decodeDna(JSON.stringify(bad))
+  it('rejects forbidden keys in raw JSON', async () => {
+    const raw = JSON.stringify(base).replace(
+      '"schema":',
+      '"__proto__":{"admin":true},"schema":',
+    )
+    const r = await decodeDna(raw)
     expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.errors.some(e => e.includes('forbidden'))).toBe(true)
   })
 
   it('extracts JSON from the DNA block', () => {
