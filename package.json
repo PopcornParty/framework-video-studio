@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "react": "^19.3.1",
@@ -30,6 +31,7 @@
     "typescript": "~5.7.2",
     "vite": "^6.0.5",
     "vite-plugin-pwa": "^0.21.1",
-    "workbox-window": "^7.3.0"
+    "workbox-window": "^7.3.0",
+    "vitest": "^2.1.8"
   }
 }
