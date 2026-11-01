@@ -1,6 +1,7 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb'
 import { normalizeTag } from './tags'
 import type { Research } from './research'
+import type { StorytellingState } from './storytelling/types'
 
 export interface Asset {
   id: string
@@ -64,6 +65,7 @@ export interface Production {
   title: string
   prompt: string
   research?: Research
+  storytelling?: StorytellingState
   interpretedIntent?: {
     subject: string
     duration: number
