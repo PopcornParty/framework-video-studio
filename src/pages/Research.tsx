@@ -12,6 +12,7 @@ import {
   setApprovedForScript,
   setVerificationStatus,
   approvedFacts,
+  scriptTreatment,
   resetIdCounter,
 } from '../lib/research'
 
@@ -113,13 +114,13 @@ export default function ResearchPage() {
     <div className="p-4 space-y-4">
       <h2 className="text-2xl font-semibold">Research</h2>
       <p className="text-xs text-gray-500">
-        Production {production.id}. Approving a fact means it may be used in the script. It does not mean the fact has been independently verified.
+        Approving a fact allows it in the script. It does not change how the fact may be stated. Verification rules always apply.
       </p>
 
       <div className="bg-dark-card border border-dark-border rounded-lg p-3 space-y-2">
         <input
           className="w-full bg-dark-bg border border-dark-border rounded px-3 py-2 text-sm"
-          placeholder="Source label (e.g. Wikipedia, article title)"
+          placeholder="Source label"
           value={label}
           onChange={e => setLabel(e.target.value)}
         />
@@ -159,7 +160,7 @@ export default function ResearchPage() {
         <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-3">
           <p className="text-sm text-yellow-300">Possible conflicts ({conflicts.length} facts)</p>
           <p className="text-xs text-yellow-200/70 mt-1">
-            Detection only looks for different numbers plus shared words across sources. It can miss real contradictions and can flag unrelated numbers. Review manually.
+            Detection only looks for different numbers plus shared words. It can miss real contradictions and can flag unrelated numbers.
           </p>
         </div>
       )}
@@ -167,46 +168,48 @@ export default function ResearchPage() {
       {research && research.facts.length > 0 && (
         <div className="space-y-2">
           <h3 className="text-sm font-medium">Facts ({research.facts.length})</h3>
-          {research.facts.map((f: Fact) => (
-            <div key={f.id} className="bg-dark-card border border-dark-border rounded-lg p-3">
-              <p className="text-sm">{f.statement}</p>
-              <p className="text-xs text-gray-500 mt-1">
-                {f.id} · source {f.sourceId}
-                {f.conflictsWith.length > 0 && (
-                  <span className="text-yellow-400"> · possible conflict with {f.conflictsWith.join(', ')}</span>
-                )}
-              </p>
-              <p className="text-xs mt-1">
-                Verification: <span className="text-gray-300">{f.verificationStatus}</span>
-                {' · '}
-                Script: <span className={f.approvedForScript ? 'text-green-400' : 'text-gray-400'}>
-                  {f.approvedForScript ? 'approved for use' : 'not approved'}
-                </span>
-              </p>
-              <div className="flex flex-wrap gap-2 mt-2">
-                <button
-                  onClick={() => toggleApproved(f.id, f.approvedForScript)}
-                  className={`text-xs px-2 py-1 rounded ${f.approvedForScript ? 'bg-green-700 text-white' : 'border border-dark-border'}`}
-                >
-                  {f.approvedForScript ? 'Approved' : 'Approve for script'}
-                </button>
-                <select
-                  className="text-xs bg-dark-bg border border-dark-border rounded px-2 py-1"
-                  value={f.verificationStatus}
-                  onChange={e => changeVerification(f.id, e.target.value as VerificationStatus)}
-                >
-                  <option value="unverified">Unverified</option>
-                  <option value="user-stated">User-stated</option>
-                  <option value="assumption">Assumption</option>
-                </select>
+          {research.facts.map((f: Fact) => {
+            const treatment = scriptTreatment(f.verificationStatus)
+            return (
+              <div key={f.id} className="bg-dark-card border border-dark-border rounded-lg p-3">
+                <p className="text-sm">{f.statement}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {f.id} · source {f.sourceId}
+                  {f.conflictsWith.length > 0 && (
+                    <span className="text-yellow-400"> · possible conflict with {f.conflictsWith.join(', ')}</span>
+                  )}
+                </p>
+                <p className="text-xs mt-1 text-gray-400">
+                  Script rule: {treatment}
+                  {f.approvedForScript ? ' · approved for script' : ' · not approved'}
+                </p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <button
+                    onClick={() => toggleApproved(f.id, f.approvedForScript)}
+                    className={`text-xs px-2 py-1 rounded ${f.approvedForScript ? 'bg-green-700 text-white' : 'border border-dark-border'}`}
+                  >
+                    {f.approvedForScript ? 'Approved' : 'Approve for script'}
+                  </button>
+                  <select
+                    className="text-xs bg-dark-bg border border-dark-border rounded px-2 py-1"
+                    value={f.verificationStatus}
+                    onChange={e => changeVerification(f.id, e.target.value as VerificationStatus)}
+                  >
+                    <option value="verified">Verified</option>
+                    <option value="user-stated">User-stated</option>
+                    <option value="unverified">Unverified</option>
+                    <option value="assumption">Assumption</option>
+                  </select>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
-      <div className="text-xs text-gray-500">
-        Facts approved for script: {approved.length} (verification status is separate)
+      <div className="text-xs text-gray-500 space-y-1">
+        <p>Approved for script: {approved.length}</p>
+        <p>Verified → may be stated as fact. User-stated → attribute. Unverified → qualify or exclude. Assumption → never as fact.</p>
       </div>
     </div>
   )
