@@ -75,8 +75,14 @@ export default function CreateVideo() {
       >
         Start with Research
       </button>
+      <button
+        onClick={() => navigate('/import')}
+        className="w-full border border-dark-border text-sm py-3 rounded-lg"
+      >
+        Import DNA package
+      </button>
       <p className="text-xs text-gray-500">
-        This creates a production and opens the research intake. Existing media library data is preserved.
+        Start with Research creates a blank production. Import DNA validates a package and stores the plan. Neither downloads assets nor renders a video.
       </p>
     </div>
   )
