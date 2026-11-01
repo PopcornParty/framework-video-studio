@@ -11,6 +11,7 @@ import {
 } from './types'
 
 const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype'])
+const FORBIDDEN_KEY_RE = /"(__proto__|constructor|prototype)"\s*:/
 
 export function extractJson(raw: string): string {
   const start = raw.indexOf('---FRAMEWORK DNA')
@@ -67,6 +68,10 @@ export async function decodeDna(raw: string): Promise<DecodeResult> {
   }
 
   const jsonText = extractJson(raw)
+  if (FORBIDDEN_KEY_RE.test(jsonText)) {
+    return { ok: false, errors: ['DNA contains forbidden keys.'] }
+  }
+
   let parsed: unknown
   try {
     parsed = JSON.parse(jsonText)
