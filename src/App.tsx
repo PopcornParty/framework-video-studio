@@ -8,6 +8,7 @@ import Productions from './pages/Productions'
 import SettingsPage from './pages/Settings'
 import ResearchPage from './pages/Research'
 import StoryStructurePage from './pages/StoryStructure'
+import ImportDna from './pages/ImportDna'
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/create" element={<CreateVideo />} />
+            <Route path="/import" element={<ImportDna />} />
             <Route path="/research/:id?" element={<ResearchPage />} />
             <Route path="/structure/:id" element={<StoryStructurePage />} />
             <Route path="/library" element={<MediaLibrary />} />
