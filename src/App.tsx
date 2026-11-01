@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
+import { HashRouter, Routes, Route, NavLink } from 'react-router-dom'
 import { Home, Library, Clapperboard, Settings, Plus } from 'lucide-react'
 import Dashboard from './pages/Dashboard'
 import CreateVideo from './pages/CreateVideo'
@@ -9,7 +9,7 @@ import SettingsPage from './pages/Settings'
 
 function App() {
   return (
-    <BrowserRouter basename="/framework-video-studio">
+    <HashRouter>
       <div className="min-h-screen bg-dark-bg flex flex-col">
         <header className="border-b border-dark-border px-4 py-3 flex items-center justify-between sticky top-0 bg-dark-bg/95 backdrop-blur z-10">
           <h1 className="text-lg font-semibold tracking-tight">FRAMEWORK</h1>
@@ -50,7 +50,7 @@ function App() {
           </NavLink>
         </nav>
       </div>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 
