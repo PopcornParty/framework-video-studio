@@ -8,12 +8,60 @@ import {
   approvedFacts,
   scriptTreatment,
   allowedScriptUse,
+  splitSentences,
   resetIdCounter,
   Fact,
 } from './research'
 
 beforeEach(() => {
   resetIdCounter(1)
+})
+
+describe('sentence splitting', () => {
+  it('does not split on decimal points inside numbers', () => {
+    const text = 'The Bugatti Chiron has an 8.0-litre quad-turbocharged W16 engine.'
+    const sentences = splitSentences(text)
+    expect(sentences).toHaveLength(1)
+    expect(sentences[0]).toContain('8.0-litre')
+    expect(sentences[0]).toContain('W16 engine')
+  })
+
+  it('preserves thousands separators', () => {
+    const text = 'The engine produces 1,500 PS of power in standard form.'
+    const sentences = splitSentences(text)
+    expect(sentences).toHaveLength(1)
+    expect(sentences[0]).toContain('1,500 PS')
+  })
+
+  it('preserves units with slashes', () => {
+    const text = 'Top speed is listed as 420 km/h under controlled conditions.'
+    const sentences = splitSentences(text)
+    expect(sentences).toHaveLength(1)
+    expect(sentences[0]).toContain('420 km/h')
+  })
+
+  it('preserves common abbreviations', () => {
+    const text = 'According to Dr. Smith the result was confirmed later.'
+    const sentences = splitSentences(text)
+    expect(sentences).toHaveLength(1)
+    expect(sentences[0]).toContain('Dr. Smith')
+  })
+
+  it('still splits on real sentence endings', () => {
+    const text = 'First sentence is long enough here. Second sentence is also long enough.'
+    const sentences = splitSentences(text)
+    expect(sentences).toHaveLength(2)
+  })
+
+  it('extracts the Bugatti sentence as one complete fact', () => {
+    const src = createSource('Spec', 'The Bugatti Chiron has an 8.0-litre quad-turbocharged W16 engine.')
+    const facts = extractCandidateFacts(src.rawText, src.id)
+    expect(facts).toHaveLength(1)
+    expect(facts[0].statement).toContain('8.0-litre')
+    expect(facts[0].statement).not.toBe('The Bugatti Chiron has an 8')
+    expect(facts[0].verificationStatus).toBe('unverified')
+    expect(facts[0].approvedForScript).toBe(false)
+  })
 })
 
 describe('research intake', () => {
