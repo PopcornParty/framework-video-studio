@@ -1,6 +1,6 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb'
 
-interface Asset {
+export interface Asset {
   id: string
   filename: string
   displayName: string
@@ -23,12 +23,24 @@ interface Asset {
   fileBlob?: Blob
 }
 
-interface Production {
+export interface StoryboardScene {
+  sceneNumber: number
+  assetId: string
+  description: string
+  startTime: number
+  duration: number
+  endTime: number
+  reason: string
+  transition: string
+  textOverlay?: string
+}
+
+export interface Production {
   id: string
   title: string
   prompt: string
   status: 'draft' | 'approved' | 'rendered'
-  storyboard: any[]
+  storyboard: StoryboardScene[]
   createdAt: number
   updatedAt: number
 }
@@ -85,5 +97,3 @@ export async function getApprovedAssets(): Promise<Asset[]> {
   const db = await getDB()
   return db.getAllFromIndex('assets', 'by-approved', true)
 }
-
-export type { Asset, Production }
