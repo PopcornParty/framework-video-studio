@@ -40,6 +40,13 @@ describe('sentence splitting', () => {
     expect(sentences[0]).toContain('420 km/h')
   })
 
+  it('preserves percentages with decimals', () => {
+    const text = 'Efficiency improved by 3.5 percent in the latest test cycle.'
+    const sentences = splitSentences(text)
+    expect(sentences).toHaveLength(1)
+    expect(sentences[0]).toContain('3.5')
+  })
+
   it('preserves common abbreviations', () => {
     const text = 'According to Dr. Smith the result was confirmed later.'
     const sentences = splitSentences(text)
@@ -51,6 +58,13 @@ describe('sentence splitting', () => {
     const text = 'First sentence is long enough here. Second sentence is also long enough.'
     const sentences = splitSentences(text)
     expect(sentences).toHaveLength(2)
+  })
+
+  it('returns empty for empty or very short text', () => {
+    expect(splitSentences('')).toEqual([])
+    expect(splitSentences('Too short.')).toEqual([])
+    expect(extractCandidateFacts('', 'SRC-1')).toEqual([])
+    expect(extractCandidateFacts('Hi.', 'SRC-1')).toEqual([])
   })
 
   it('extracts the Bugatti sentence as one complete fact', () => {
