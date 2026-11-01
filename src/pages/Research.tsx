@@ -5,11 +5,13 @@ import {
   Research as ResearchType,
   Source,
   Fact,
+  VerificationStatus,
   createSource,
   extractCandidateFacts,
   detectConflicts,
-  markFact,
-  verifiedFacts,
+  setApprovedForScript,
+  setVerificationStatus,
+  approvedFacts,
   resetIdCounter,
 } from '../lib/research'
 
@@ -79,9 +81,20 @@ export default function ResearchPage() {
     setPublishedAt('')
   }
 
-  async function setConfidence(factId: string, confidence: Fact['confidence']) {
+  async function toggleApproved(factId: string, current: boolean) {
     if (!production?.research) return
-    const facts = markFact(production.research.facts, factId, confidence)
+    const facts = setApprovedForScript(production.research.facts, factId, !current)
+    const updated: Production = {
+      ...production,
+      research: { ...production.research, facts, lastUpdated: Date.now() },
+    }
+    await saveProduction(updated)
+    setProduction(updated)
+  }
+
+  async function changeVerification(factId: string, status: VerificationStatus) {
+    if (!production?.research) return
+    const facts = setVerificationStatus(production.research.facts, factId, status)
     const updated: Production = {
       ...production,
       research: { ...production.research, facts, lastUpdated: Date.now() },
@@ -93,13 +106,15 @@ export default function ResearchPage() {
   if (loading || !production) return <div className="p-4">Loading...</div>
 
   const research = production.research
-  const verified = research ? verifiedFacts(research.facts) : []
+  const approved = research ? approvedFacts(research.facts) : []
   const conflicts = research?.facts.filter(f => f.conflictsWith.length > 0) || []
 
   return (
     <div className="p-4 space-y-4">
       <h2 className="text-2xl font-semibold">Research</h2>
-      <p className="text-xs text-gray-500">Production {production.id}. Existing media and tags are untouched.</p>
+      <p className="text-xs text-gray-500">
+        Production {production.id}. Approving a fact means it may be used in the script. It does not mean the fact has been independently verified.
+      </p>
 
       <div className="bg-dark-card border border-dark-border rounded-lg p-3 space-y-2">
         <input
@@ -142,42 +157,48 @@ export default function ResearchPage() {
 
       {conflicts.length > 0 && (
         <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-3">
-          <p className="text-sm text-yellow-300">Conflicts detected ({conflicts.length} facts)</p>
-          <p className="text-xs text-yellow-200/70 mt-1">Review and mark which facts to use.</p>
+          <p className="text-sm text-yellow-300">Possible conflicts ({conflicts.length} facts)</p>
+          <p className="text-xs text-yellow-200/70 mt-1">
+            Detection only looks for different numbers plus shared words across sources. It can miss real contradictions and can flag unrelated numbers. Review manually.
+          </p>
         </div>
       )}
 
       {research && research.facts.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium">Candidate facts ({research.facts.length})</h3>
+          <h3 className="text-sm font-medium">Facts ({research.facts.length})</h3>
           {research.facts.map((f: Fact) => (
             <div key={f.id} className="bg-dark-card border border-dark-border rounded-lg p-3">
               <p className="text-sm">{f.statement}</p>
               <p className="text-xs text-gray-500 mt-1">
                 {f.id} · source {f.sourceId}
                 {f.conflictsWith.length > 0 && (
-                  <span className="text-yellow-400"> · conflicts with {f.conflictsWith.join(', ')}</span>
+                  <span className="text-yellow-400"> · possible conflict with {f.conflictsWith.join(', ')}</span>
                 )}
               </p>
-              <div className="flex gap-2 mt-2">
+              <p className="text-xs mt-1">
+                Verification: <span className="text-gray-300">{f.verificationStatus}</span>
+                {' · '}
+                Script: <span className={f.approvedForScript ? 'text-green-400' : 'text-gray-400'}>
+                  {f.approvedForScript ? 'approved for use' : 'not approved'}
+                </span>
+              </p>
+              <div className="flex flex-wrap gap-2 mt-2">
                 <button
-                  onClick={() => setConfidence(f.id, 'user-verified')}
-                  className={`text-xs px-2 py-1 rounded ${f.confidence === 'user-verified' ? 'bg-green-700 text-white' : 'border border-dark-border'}`}
+                  onClick={() => toggleApproved(f.id, f.approvedForScript)}
+                  className={`text-xs px-2 py-1 rounded ${f.approvedForScript ? 'bg-green-700 text-white' : 'border border-dark-border'}`}
                 >
-                  Use
+                  {f.approvedForScript ? 'Approved' : 'Approve for script'}
                 </button>
-                <button
-                  onClick={() => setConfidence(f.id, 'assumption')}
-                  className={`text-xs px-2 py-1 rounded ${f.confidence === 'assumption' ? 'bg-yellow-700 text-white' : 'border border-dark-border'}`}
+                <select
+                  className="text-xs bg-dark-bg border border-dark-border rounded px-2 py-1"
+                  value={f.verificationStatus}
+                  onChange={e => changeVerification(f.id, e.target.value as VerificationStatus)}
                 >
-                  Assumption
-                </button>
-                <button
-                  onClick={() => setConfidence(f.id, 'candidate')}
-                  className="text-xs px-2 py-1 rounded border border-dark-border"
-                >
-                  Ignore
-                </button>
+                  <option value="unverified">Unverified</option>
+                  <option value="user-stated">User-stated</option>
+                  <option value="assumption">Assumption</option>
+                </select>
               </div>
             </div>
           ))}
@@ -185,7 +206,7 @@ export default function ResearchPage() {
       )}
 
       <div className="text-xs text-gray-500">
-        Verified facts ready for script: {verified.length}
+        Facts approved for script: {approved.length} (verification status is separate)
       </div>
     </div>
   )
