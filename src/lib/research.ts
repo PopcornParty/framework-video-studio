@@ -59,14 +59,15 @@ function nextId(prefix: string): string {
  * Split text into sentences without breaking on:
  * - decimal numbers (8.0, 1.5)
  * - thousands separators (1,500)
- * - common abbreviations (e.g., i.e., etc., Dr., Mr., km/h units stay intact)
+ * - percentages (3.5%)
+ * - common abbreviations (e.g., i.e., etc., Dr., Mr.)
  */
 export function splitSentences(text: string): string[] {
   if (!text.trim()) return []
   const protectedText = text
     .replace(/(\d)\.(\d)/g, '$1§DEC§$2')
     .replace(/(\d),(\d{3})/g, '$1§COM§$2')
-    .replace(/\b(e\.g|i\.e|etc|Dr|Mr|Mrs|Ms|Prof|vs|Fig)\./gi, '$1§ABBR§')
+    .replace(/\b(e\.g|i\.e|etc|Dr|Mr|Mrs|Ms|Prof|vs|Fig|approx|No)\./gi, '$1§ABBR§')
 
   const parts = protectedText
     .split(/[.!?]+/)
