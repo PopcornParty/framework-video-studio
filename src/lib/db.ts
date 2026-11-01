@@ -61,6 +61,15 @@ export interface RenderSettings {
   quality: 'high' | 'medium' | 'low'
 }
 
+export interface UserMediaMatch {
+  assetId: string
+  filename: string
+  hash: string
+  size: number
+  type: string
+  blob?: Blob
+}
+
 export interface Production {
   id: string
   title: string
@@ -84,6 +93,7 @@ export interface Production {
   dna?: DnaPackage
   dnaFingerprint?: string
   dnaImportedAt?: number
+  userMedia?: UserMediaMatch[]
 }
 
 export interface TagRecord {
@@ -273,7 +283,7 @@ export interface ExportData {
   version: 1
   exportedAt: number
   assets: Omit<Asset, 'fileBlob'>[]
-  productions: Omit<Production, 'outputBlob'>[]
+  productions: Omit<Production, 'outputBlob' | 'userMedia'>[]
   tags: TagRecord[]
 }
 
@@ -287,7 +297,7 @@ export async function exportProject(): Promise<ExportData> {
     version: 1,
     exportedAt: Date.now(),
     assets: assets.map(({ fileBlob, ...rest }) => rest),
-    productions: productions.map(({ outputBlob, ...rest }) => rest),
+    productions: productions.map(({ outputBlob, userMedia, ...rest }) => rest),
     tags,
   }
 }
