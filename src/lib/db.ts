@@ -1,5 +1,6 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb'
 import { normalizeTag } from './tags'
+import type { Research } from './research'
 
 export interface Asset {
   id: string
@@ -62,6 +63,7 @@ export interface Production {
   id: string
   title: string
   prompt: string
+  research?: Research
   interpretedIntent?: {
     subject: string
     duration: number
