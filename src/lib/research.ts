@@ -8,7 +8,7 @@ export interface Source {
   addedAt: number
 }
 
-export type VerificationStatus = 'unverified' | 'user-stated' | 'assumption'
+export type VerificationStatus = 'verified' | 'user-stated' | 'unverified' | 'assumption'
 
 export interface Fact {
   id: string
@@ -25,6 +25,35 @@ export interface Research {
   facts: Fact[]
   gaps: string[]
   lastUpdated: number
+}
+
+/**
+ * How a fact may appear in a script.
+ * Approval for script never overrides these rules.
+ */
+export type ScriptTreatment =
+  | 'established-fact'      // verified: may be stated as fact
+  | 'attributed'            // user-stated: include only with attribution
+  | 'qualified-or-exclude'  // unverified: qualify clearly or omit
+  | 'never-as-fact'         // assumption: must never be presented as established fact
+
+export function scriptTreatment(status: VerificationStatus): ScriptTreatment {
+  switch (status) {
+    case 'verified': return 'established-fact'
+    case 'user-stated': return 'attributed'
+    case 'unverified': return 'qualified-or-exclude'
+    case 'assumption': return 'never-as-fact'
+  }
+}
+
+/**
+ * Returns the treatment a fact is allowed in the script.
+ * If not approved for script, returns null (must be excluded).
+ * Approval does not upgrade the verification treatment.
+ */
+export function allowedScriptUse(fact: Fact): ScriptTreatment | null {
+  if (!fact.approvedForScript) return null
+  return scriptTreatment(fact.verificationStatus)
 }
 
 let idCounter = 1
