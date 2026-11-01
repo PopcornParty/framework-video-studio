@@ -8,11 +8,14 @@ export interface Source {
   addedAt: number
 }
 
+export type VerificationStatus = 'unverified' | 'user-stated' | 'assumption'
+
 export interface Fact {
   id: string
   statement: string
   sourceId: string
-  confidence: 'user-verified' | 'assumption' | 'candidate'
+  verificationStatus: VerificationStatus
+  approvedForScript: boolean
   conflictsWith: string[]
 }
 
@@ -42,11 +45,27 @@ export function extractCandidateFacts(text: string, sourceId: string): Fact[] {
     id: nextId('FCT'),
     statement,
     sourceId,
-    confidence: 'candidate' as const,
+    verificationStatus: 'unverified' as const,
+    approvedForScript: false,
     conflictsWith: [],
   }))
 }
 
+/**
+ * Conflict detection is intentionally limited.
+ *
+ * What it does:
+ * - Looks for facts from different sources that share at least one significant word
+ *   and contain different numbers.
+ *
+ * What it does not do:
+ * - Understand meaning, negation, or units.
+ * - Detect non-numeric contradictions (e.g. "is electric" vs "is petrol").
+ * - Avoid false positives when numbers refer to different things
+ *   (e.g. year vs speed, or two unrelated counts that share a common word).
+ *
+ * Results are suggestions only. The user must decide.
+ */
 export function detectConflicts(facts: Fact[]): Fact[] {
   const result = facts.map(f => ({ ...f, conflictsWith: [...f.conflictsWith] }))
   const numberPattern = /\b(\d+(?:\.\d+)?)\b/g
@@ -86,10 +105,14 @@ export function createSource(label: string, rawText: string, publishedAt?: strin
   }
 }
 
-export function markFact(facts: Fact[], factId: string, confidence: Fact['confidence']): Fact[] {
-  return facts.map(f => f.id === factId ? { ...f, confidence } : f)
+export function setApprovedForScript(facts: Fact[], factId: string, approved: boolean): Fact[] {
+  return facts.map(f => f.id === factId ? { ...f, approvedForScript: approved } : f)
 }
 
-export function verifiedFacts(facts: Fact[]): Fact[] {
-  return facts.filter(f => f.confidence === 'user-verified')
+export function setVerificationStatus(facts: Fact[], factId: string, status: VerificationStatus): Fact[] {
+  return facts.map(f => f.id === factId ? { ...f, verificationStatus: status } : f)
+}
+
+export function approvedFacts(facts: Fact[]): Fact[] {
+  return facts.filter(f => f.approvedForScript)
 }
