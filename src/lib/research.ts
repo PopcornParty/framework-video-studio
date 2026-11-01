@@ -27,15 +27,11 @@ export interface Research {
   lastUpdated: number
 }
 
-/**
- * How a fact may appear in a script.
- * Approval for script never overrides these rules.
- */
 export type ScriptTreatment =
-  | 'established-fact'      // verified: may be stated as fact
-  | 'attributed'            // user-stated: include only with attribution
-  | 'qualified-or-exclude'  // unverified: qualify clearly or omit
-  | 'never-as-fact'         // assumption: must never be presented as established fact
+  | 'established-fact'
+  | 'attributed'
+  | 'qualified-or-exclude'
+  | 'never-as-fact'
 
 export function scriptTreatment(status: VerificationStatus): ScriptTreatment {
   switch (status) {
@@ -46,11 +42,6 @@ export function scriptTreatment(status: VerificationStatus): ScriptTreatment {
   }
 }
 
-/**
- * Returns the treatment a fact is allowed in the script.
- * If not approved for script, returns null (must be excluded).
- * Approval does not upgrade the verification treatment.
- */
 export function allowedScriptUse(fact: Fact): ScriptTreatment | null {
   if (!fact.approvedForScript) return null
   return scriptTreatment(fact.verificationStatus)
@@ -64,12 +55,34 @@ function nextId(prefix: string): string {
   return `${prefix}-${String(idCounter++).padStart(4, '0')}`
 }
 
-export function extractCandidateFacts(text: string, sourceId: string): Fact[] {
+/**
+ * Split text into sentences without breaking on:
+ * - decimal numbers (8.0, 1.5)
+ * - thousands separators (1,500)
+ * - common abbreviations (e.g., i.e., etc., Dr., Mr., km/h units stay intact)
+ */
+export function splitSentences(text: string): string[] {
   if (!text.trim()) return []
-  const sentences = text
+  const protectedText = text
+    .replace(/(\d)\.(\d)/g, '$1§DEC§$2')
+    .replace(/(\d),(\d{3})/g, '$1§COM§$2')
+    .replace(/\b(e\.g|i\.e|etc|Dr|Mr|Mrs|Ms|Prof|vs|Fig)\./gi, '$1§ABBR§')
+
+  const parts = protectedText
     .split(/[.!?]+/)
-    .map(s => s.trim())
+    .map(s => s
+      .replace(/§DEC§/g, '.')
+      .replace(/§COM§/g, ',')
+      .replace(/§ABBR§/g, '.')
+      .trim()
+    )
     .filter(s => s.length > 15 && s.split(/\s+/).length >= 4)
+
+  return parts
+}
+
+export function extractCandidateFacts(text: string, sourceId: string): Fact[] {
+  const sentences = splitSentences(text)
   return sentences.map(statement => ({
     id: nextId('FCT'),
     statement,
@@ -80,21 +93,6 @@ export function extractCandidateFacts(text: string, sourceId: string): Fact[] {
   }))
 }
 
-/**
- * Conflict detection is intentionally limited.
- *
- * What it does:
- * - Looks for facts from different sources that share at least one significant word
- *   and contain different numbers.
- *
- * What it does not do:
- * - Understand meaning, negation, or units.
- * - Detect non-numeric contradictions (e.g. "is electric" vs "is petrol").
- * - Avoid false positives when numbers refer to different things
- *   (e.g. year vs speed, or two unrelated counts that share a common word).
- *
- * Results are suggestions only. The user must decide.
- */
 export function detectConflicts(facts: Fact[]): Fact[] {
   const result = facts.map(f => ({ ...f, conflictsWith: [...f.conflictsWith] }))
   const numberPattern = /\b(\d+(?:\.\d+)?)\b/g
