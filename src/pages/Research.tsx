@@ -211,6 +211,13 @@ export default function ResearchPage() {
         <p>Approved for script: {approved.length}</p>
         <p>Verified → may be stated as fact. User-stated → attribute. Unverified → qualify or exclude. Assumption → never as fact.</p>
       </div>
+
+      <button
+        onClick={() => navigate(`/structure/${production.id}`)}
+        className="w-full bg-blue-600 text-white py-2 rounded-lg text-sm"
+      >
+        Continue to story structure
+      </button>
     </div>
   )
 }
