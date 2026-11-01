@@ -88,6 +88,11 @@ export async function getNextAssetId(): Promise<string> {
   return `AST-${String(next).padStart(6, '0')}`
 }
 
+export async function saveAsset(asset: Asset): Promise<void> {
+  const db = await getDB()
+  await db.put('assets', asset)
+}
+
 export async function getAllAssets(): Promise<Asset[]> {
   const db = await getDB()
   return db.getAll('assets')
@@ -96,4 +101,17 @@ export async function getAllAssets(): Promise<Asset[]> {
 export async function getApprovedAssets(): Promise<Asset[]> {
   const db = await getDB()
   return db.getAllFromIndex('assets', 'by-approved', true)
+}
+
+export async function deleteAsset(id: string): Promise<void> {
+  const db = await getDB()
+  await db.delete('assets', id)
+}
+
+export async function updateAsset(id: string, updates: Partial<Asset>): Promise<void> {
+  const db = await getDB()
+  const existing = await db.get('assets', id)
+  if (existing) {
+    await db.put('assets', { ...existing, ...updates })
+  }
 }
