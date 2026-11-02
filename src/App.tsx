@@ -9,6 +9,7 @@ import SettingsPage from './pages/Settings'
 import ResearchPage from './pages/Research'
 import StoryStructurePage from './pages/StoryStructure'
 import ImportDna from './pages/ImportDna'
+import CapabilityCheck from './pages/CapabilityCheck'
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/storyboard/:id?" element={<StoryboardEditor />} />
             <Route path="/productions" element={<Productions />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/capability" element={<CapabilityCheck />} />
           </Routes>
         </main>
 
