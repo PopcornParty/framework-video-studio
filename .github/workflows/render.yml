@@ -58,6 +58,7 @@ jobs:
           print('checked', dur, size)
           PY
       - name: Package ZIP
+        if: always()
         run: |
           cd render-out
           zip -r ../framework-render.zip .
@@ -72,9 +73,8 @@ jobs:
             --title "Render ${{ github.run_id }}" \
             --notes "Real render. MP4 passed ffprobe."
       - name: Upload artifact
-        if: always()
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: framework-render
           path: framework-render.zip
-          if-no-files-found: error
