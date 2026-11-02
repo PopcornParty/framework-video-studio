@@ -23,19 +23,24 @@ jobs:
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Prepare job
-        id: prep
+        env:
+          DNA: ${{ inputs.dna }}
+          JOB_PATH: ${{ inputs.job_path }}
         run: |
           mkdir -p job/media render-out
-          if [ -n "${{ inputs.job_path }}" ]; then
-            test -f "${{ inputs.job_path }}/dna.json"
-            cp "${{ inputs.job_path }}/dna.json" job/dna.json
-            if [ -d "${{ inputs.job_path }}/media" ]; then cp -r "${{ inputs.job_path }}/media/." job/media/; fi
-          elif [ -n "${{ inputs.dna }}" ]; then
-            printf '%s' "${{ inputs.dna }}" > job/dna.json
+          if [ -n "$JOB_PATH" ]; then
+            case "$JOB_PATH" in
+              jobs/*) ;;
+              *) echo "job_path must start with jobs/"; exit 1 ;;
+            esac
+            test -f "$JOB_PATH/dna.json"
+            cp "$JOB_PATH/dna.json" job/dna.json
+            if [ -d "$JOB_PATH/media" ]; then cp -r "$JOB_PATH/media/." job/media/; fi
+          elif [ -n "$DNA" ]; then
+            printf '%s' "$DNA" > job/dna.json
           else
             echo "Provide DNA or a job_path. Nothing was rendered."
-            echo "FAILED" > render-out/report.txt
-            echo "No DNA was provided." >> render-out/report.txt
+            printf 'FAILED\nNo DNA was provided.\n' > render-out/report.txt
             exit 1
           fi
       - name: Render
