@@ -81,8 +81,14 @@ export default function CreateVideo() {
       >
         Import DNA package
       </button>
+      <button
+        onClick={() => navigate('/cloud')}
+        className="w-full border border-dark-border text-sm py-3 rounded-lg"
+      >
+        Send to GitHub render
+      </button>
       <p className="text-xs text-gray-500">
-        Start with Research creates a blank production. Import DNA validates a package and stores the plan. Neither downloads assets nor renders a video.
+        Start with Research creates a blank production. Import DNA validates a package. Send to GitHub render opens the cloud handoff. None of these render on the phone.
       </p>
     </div>
   )
