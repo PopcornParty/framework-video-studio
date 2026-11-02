@@ -11,8 +11,15 @@ function run(cmd, args) {
     let err = ''
     p.stdout.on('data', d => { out += d })
     p.stderr.on('data', d => { err += d })
-    p.on('close', code => code === 0 ? resolve(out) : reject(new Error(err || `${cmd} failed`)))
+    p.on('close', code => code === 0 ? resolve(out) : reject(new Error((err || out || `${cmd} failed`).slice(-2000))))
   })
+}
+
+async function fail(outDir, message) {
+  await mkdir(outDir, { recursive: true })
+  await writeFile(path.join(outDir, 'report.txt'), `FAILED\n${message}\n`)
+  console.error(message)
+  process.exit(1)
 }
 
 async function main() {
@@ -27,21 +34,16 @@ async function main() {
   const files = mediaDir ? (await readdir(mediaDir).catch(() => [])) : []
   const plan = planJob(dna, files)
   await mkdir(outDir, { recursive: true })
-  if (!plan.ok) {
-    await writeFile(path.join(outDir, 'report.txt'), `FAILED\n${plan.errors.join('\n')}\n`)
-    console.error(plan.errors.join('\n'))
-    process.exit(1)
-  }
+  if (!plan.ok) return fail(outDir, plan.errors.join('\n'))
 
   const inputs = []
   for (const shot of plan.shots) {
     const dest = path.join(outDir, `${shot.id}.img`)
     if (shot.kind === 'url') {
-      const res = await fetch(shot.url)
-      if (!res.ok) {
-        await writeFile(path.join(outDir, 'report.txt'), `FAILED\nCould not fetch ${shot.id}: HTTP ${res.status}\n`)
-        process.exit(1)
-      }
+      const res = await fetch(shot.url, {
+        headers: { 'User-Agent': 'FRAMEWORK-Video-Studio/0.1 (GitHub Actions render; contact: popcornparty)' },
+      })
+      if (!res.ok) return fail(outDir, `Could not fetch ${shot.id}: HTTP ${res.status}`)
       await writeFile(dest, Buffer.from(await res.arrayBuffer()))
     } else {
       const src = path.join(mediaDir, shot.file)
@@ -69,14 +71,17 @@ async function main() {
   ])
   const duration = Number(probe.trim())
   if (!Number.isFinite(duration) || duration <= 0) {
-    await writeFile(path.join(outDir, 'report.txt'), 'FAILED\nffprobe found no playable duration. Not reporting success.\n')
-    process.exit(1)
+    return fail(outDir, 'ffprobe found no playable duration. Not reporting success.')
   }
   await writeFile(path.join(outDir, 'report.txt'), `OK\nduration=${duration}\nshots=${plan.shots.map(s => s.id).join(',')}\n`)
   console.log(`Rendered ${mp4} (${duration}s)`)
 }
 
 main().catch(async err => {
-  console.error(err.message || err)
+  const outDir = process.argv[4] || 'render-out'
+  const message = err instanceof Error ? err.message : String(err)
+  await mkdir(outDir, { recursive: true }).catch(() => {})
+  await writeFile(path.join(outDir, 'report.txt'), `FAILED\n${message}\n`).catch(() => {})
+  console.error(message)
   process.exit(1)
 })
