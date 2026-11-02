@@ -10,6 +10,7 @@ import ResearchPage from './pages/Research'
 import StoryStructurePage from './pages/StoryStructure'
 import ImportDna from './pages/ImportDna'
 import CapabilityCheck from './pages/CapabilityCheck'
+import CloudRender from './pages/CloudRender'
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path="/productions" element={<Productions />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/capability" element={<CapabilityCheck />} />
+            <Route path="/cloud" element={<CloudRender />} />
           </Routes>
         </main>
 
