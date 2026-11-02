@@ -41,9 +41,12 @@ async function main() {
     const dest = path.join(outDir, `${shot.id}.img`)
     if (shot.kind === 'url') {
       const res = await fetch(shot.url, {
-        headers: { 'User-Agent': 'FRAMEWORK-Video-Studio/0.1 (GitHub Actions render; contact: popcornparty)' },
+        headers: {
+          'User-Agent': 'FRAMEWORKVideoStudio/0.1 (https://github.com/PopcornParty/framework-video-studio)',
+          'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+        },
       })
-      if (!res.ok) return fail(outDir, `Could not fetch ${shot.id}: HTTP ${res.status}`)
+      if (!res.ok) return fail(outDir, `Could not fetch ${shot.id}: HTTP ${res.status} ${shot.url}`)
       await writeFile(dest, Buffer.from(await res.arrayBuffer()))
     } else {
       const src = path.join(mediaDir, shot.file)
