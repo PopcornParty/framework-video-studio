@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function SettingsPage() {
   return (
     <div className="p-4 space-y-6">
@@ -6,6 +8,11 @@ export default function SettingsPage() {
         <div className="bg-dark-card border border-dark-border rounded-lg p-4">
           <h3 className="font-medium mb-2">Rendering</h3>
           <p className="text-sm text-gray-400">Not available yet. No render settings can be changed.</p>
+        </div>
+        <div className="bg-dark-card border border-dark-border rounded-lg p-4">
+          <h3 className="font-medium mb-2">iPhone capability check</h3>
+          <p className="text-sm text-gray-400 mb-2">Runs real device tests. Does not render a production.</p>
+          <Link to="/capability" className="text-sm text-blue-400 underline">Open capability check</Link>
         </div>
         <div className="bg-dark-card border border-dark-border rounded-lg p-4">
           <h3 className="font-medium mb-2">Storage</h3>
