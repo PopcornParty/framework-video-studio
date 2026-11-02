@@ -13,7 +13,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   render:
@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
-      - name: Prepare job
+      - name: Validate DNA
         env:
           DNA: ${{ inputs.dna }}
           JOB_PATH: ${{ inputs.job_path }}
@@ -39,17 +39,38 @@ jobs:
           elif [ -n "$DNA" ]; then
             printf '%s' "$DNA" > job/dna.json
           else
-            echo "Provide DNA or a job_path. Nothing was rendered."
             printf 'FAILED\nNo DNA was provided.\n' > render-out/report.txt
             exit 1
           fi
-      - name: Render
+          node -e "JSON.parse(require('fs').readFileSync('job/dna.json','utf8'))"
+      - name: Download assets and render
         run: node scripts/render-job.mjs job/dna.json job/media render-out
-      - name: Package
-        if: always()
+      - name: Check MP4
+        run: |
+          test -f render-out/video.mp4
+          dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 render-out/video.mp4)
+          python3 - <<PY
+          import os
+          dur=float("$dur" or 0)
+          assert dur > 0, 'MP4 has no duration'
+          size=os.path.getsize('render-out/video.mp4')
+          open('render-out/report.txt','a').write(f'mp4_bytes={size}\nchecked=ffprobe\n')
+          print('checked', dur, size)
+          PY
+      - name: Package ZIP
         run: |
           cd render-out
           zip -r ../framework-render.zip .
+          cp ../framework-render.zip .
+      - name: Publish release
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "render-${{ github.run_id }}" \
+            render-out/video.mp4 render-out/framework-render.zip \
+            --title "Render ${{ github.run_id }}" \
+            --notes "Real render. MP4 passed ffprobe."
       - name: Upload artifact
         if: always()
         uses: actions/upload-artifact@v4
