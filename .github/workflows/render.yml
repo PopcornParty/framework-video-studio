@@ -45,11 +45,6 @@ jobs:
       - name: Validate plan
         run: node scripts/validate-dna.mjs --plan-only --media job
 
-      - name: Fetch user music
-        env:
-          MUSIC_URL: ${{ inputs.music_url }}
-        run: node scripts/fetch-user-music.mjs job/dna.json job
-
       - name: Download assets and render
         run: node scripts/render-job.mjs job/dna.json job render-out
 
