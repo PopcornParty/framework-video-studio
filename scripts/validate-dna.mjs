@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Extract and validate FRAMEWORK DNA v1 from:
- * - a compact FW1: gzip+Base64URL code
+ * - a compact FW1: gzip+Base64URL code (prefix is case-insensitive)
  * - a wrapped FRAMEWORK DNA block
  * - raw JSON
  *
@@ -17,6 +17,7 @@ import { gunzipSync, gzipSync } from 'node:zlib'
 import { planJob } from './render-plan.mjs'
 
 export const COMPACT_PREFIX = 'FW1:'
+const COMPACT_PREFIX_RE = /^fw1:/i
 
 export function extractJson(raw) {
   if (typeof raw !== 'string') return ''
@@ -39,13 +40,53 @@ export function encodeCompact(text) {
   return COMPACT_PREFIX + compressed.toString('base64url')
 }
 
+export function isCompactDna(raw) {
+  return typeof raw === 'string' && COMPACT_PREFIX_RE.test(raw.trim())
+}
+
+/** Normalize fw1:/FW1:/Fw1: to the canonical FW1: prefix. */
+export function normalizeCompactPrefix(raw) {
+  const trimmed = String(raw || '').trim()
+  if (!COMPACT_PREFIX_RE.test(trimmed)) return trimmed
+  return COMPACT_PREFIX + trimmed.slice(COMPACT_PREFIX.length)
+}
+
+/** Diagnostics about the received input. Does not include the DNA body. */
+export function describeInput(raw) {
+  const text = typeof raw === 'string' ? raw : ''
+  const trimmed = text.trim()
+  return {
+    startsWithFw1: trimmed.startsWith(COMPACT_PREFIX),
+    startsWithFw1IgnoreCase: COMPACT_PREFIX_RE.test(trimmed),
+    characterCount: text.length,
+    hasBackticks: text.includes('`'),
+    hasQuotationMarks: text.includes('"') || text.includes("'"),
+  }
+}
+
+export function formatInputDiagnostics(raw) {
+  const d = describeInput(raw)
+  return [
+    `received starts with FW1:: ${d.startsWithFw1}`,
+    `character count: ${d.characterCount}`,
+    `contains backticks: ${d.hasBackticks}`,
+    `contains quotation marks: ${d.hasQuotationMarks}`,
+  ]
+}
+
+function preview(text, limit = 100) {
+  const value = String(text || '')
+  const slice = value.slice(0, limit).replace(/\r?\n/g, '\\n')
+  return value.length > limit ? `${slice}…` : slice
+}
+
 /** Decode an FW1: code to the original text. Throws on corruption. */
 export function decodeCompact(raw) {
   if (typeof raw !== 'string') {
     throw new Error('Compact DNA code is invalid.')
   }
   const trimmed = raw.trim()
-  if (!trimmed.startsWith(COMPACT_PREFIX)) {
+  if (!COMPACT_PREFIX_RE.test(trimmed)) {
     throw new Error('Compact DNA code must start with FW1:.')
   }
   const payload = trimmed.slice(COMPACT_PREFIX.length).trim()
@@ -79,33 +120,61 @@ export function decodeCompact(raw) {
 
 export function validateDna(raw) {
   if (typeof raw !== 'string' || !raw.trim()) {
-    return { ok: false, errors: ['DNA is empty.'] }
+    return { ok: false, errors: ['DNA is empty.', ...formatInputDiagnostics(raw)] }
   }
 
   let text = raw.trim()
-  if (text.startsWith(COMPACT_PREFIX)) {
+  let decodedFromCompact = false
+  if (isCompactDna(text)) {
     try {
-      text = decodeCompact(text)
+      text = decodeCompact(normalizeCompactPrefix(text))
+      decodedFromCompact = true
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Compact DNA code is invalid.'
-      return { ok: false, errors: [message] }
+      return {
+        ok: false,
+        errors: [
+          'Compact DNA decoding failed.',
+          message,
+          ...formatInputDiagnostics(raw),
+        ],
+      }
     }
   }
 
   const jsonText = extractJson(text)
   if (!jsonText) {
-    return { ok: false, errors: ['No DNA content found.'] }
+    return { ok: false, errors: ['No DNA content found.', ...formatInputDiagnostics(raw)] }
   }
 
   let parsed
   try {
     parsed = JSON.parse(jsonText)
   } catch {
-    return { ok: false, errors: ['DNA is not valid JSON.'] }
+    if (decodedFromCompact) {
+      return {
+        ok: false,
+        errors: [
+          'Compact DNA decoded, but the result is not valid JSON.',
+          `decoded preview: ${preview(text, 100)}`,
+          ...formatInputDiagnostics(raw),
+        ],
+      }
+    }
+    return {
+      ok: false,
+      errors: [
+        'Raw DNA is not valid JSON.',
+        ...formatInputDiagnostics(raw),
+      ],
+    }
   }
 
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    return { ok: false, errors: ['DNA must be a JSON object.'] }
+    return {
+      ok: false,
+      errors: ['DNA must be a JSON object.', ...formatInputDiagnostics(raw)],
+    }
   }
 
   const errors = []
@@ -140,7 +209,7 @@ const isMain = process.argv[1] && (
 
 if (isMain) {
   const raw = process.env.DNA || ''
-  if (!raw.trim()) fail('DNA input is required.')
+  if (!raw.trim()) fail(['DNA input is required.', ...formatInputDiagnostics(raw)].join('\n'))
 
   const result = validateDna(raw)
   if (!result.ok) fail(result.errors.join('\n'))
