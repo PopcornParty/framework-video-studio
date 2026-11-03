@@ -12,7 +12,7 @@
  * On failure writes a report and exits 1.
  */
 
-import { writeFileSync, mkdirSync } from 'node:fs'
+import { writeFileSync, mkdirSync, readFileSync, readdirSync } from 'node:fs'
 import { gunzipSync, gzipSync } from 'node:zlib'
 import { planJob } from './render-plan.mjs'
 
@@ -118,7 +118,26 @@ export function decodeCompact(raw) {
   return text
 }
 
-export function validateDna(raw) {
+export function parseDna(raw) {
+  const parsed = decodeAndParse(raw)
+  if (!parsed.ok) return parsed
+  return { ok: true, dna: parsed.dna, errors: [] }
+}
+
+export function validateDna(raw, availableFiles = []) {
+  const parsed = decodeAndParse(raw)
+  if (!parsed.ok) return parsed
+
+  // Same plan check as before. Compact input does not skip provenance or asset rules.
+  const plan = planJob(parsed.dna, availableFiles)
+  if (!plan.ok) {
+    return { ok: false, errors: plan.errors }
+  }
+
+  return { ok: true, dna: parsed.dna, errors: [] }
+}
+
+function decodeAndParse(raw) {
   if (typeof raw !== 'string' || !raw.trim()) {
     return { ok: false, errors: ['DNA is empty.', ...formatInputDiagnostics(raw)] }
   }
@@ -186,12 +205,6 @@ export function validateDna(raw) {
   }
   if (errors.length) return { ok: false, errors }
 
-  // Same plan check as before. Compact input does not skip provenance or asset rules.
-  const plan = planJob(parsed, [])
-  if (!plan.ok) {
-    return { ok: false, errors: plan.errors }
-  }
-
   return { ok: true, dna: parsed, errors: [] }
 }
 
@@ -208,10 +221,25 @@ const isMain = process.argv[1] && (
 )
 
 if (isMain) {
+  const parseOnly = process.argv.includes('--parse-only')
+  const planOnly = process.argv.includes('--plan-only')
+  const mediaDir = process.argv.includes('--media')
+    ? process.argv[process.argv.indexOf('--media') + 1]
+    : 'job'
+
+  if (planOnly) {
+    const dna = JSON.parse(readFileSync('job/dna.json', 'utf8'))
+    const files = readdirSync(mediaDir)
+    const plan = planJob(dna, files)
+    if (!plan.ok) fail(plan.errors.join('\n'))
+    console.log('Plan validated. Shots:', plan.shots.length)
+    process.exit(0)
+  }
+
   const raw = process.env.DNA || ''
   if (!raw.trim()) fail(['DNA input is required.', ...formatInputDiagnostics(raw)].join('\n'))
 
-  const result = validateDna(raw)
+  const result = parseOnly ? parseDna(raw) : validateDna(raw)
   if (!result.ok) fail(result.errors.join('\n'))
 
   mkdirSync('job', { recursive: true })

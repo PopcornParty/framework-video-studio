@@ -25,7 +25,7 @@ jobs:
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-liberation zip
 
-      - name: Validate DNA
+      - name: Parse DNA
         env:
           DNA: ${{ inputs.dna }}
         run: |
@@ -35,7 +35,15 @@ jobs:
             echo "DNA input is required."
             exit 1
           fi
-          node scripts/validate-dna.mjs
+          node scripts/validate-dna.mjs --parse-only
+
+      - name: Fetch user music
+        env:
+          MUSIC_URL: ${{ inputs.music_url }}
+        run: node scripts/fetch-user-music.mjs job/dna.json job
+
+      - name: Validate plan
+        run: node scripts/validate-dna.mjs --plan-only --media job
 
       - name: Fetch user music
         env:
