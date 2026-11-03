@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       dna:
-        description: 'Paste the complete FRAMEWORK DNA v1 block (including wrapper markers) or raw JSON'
+        description: 'Paste an FW1: compact code, a FRAMEWORK DNA v1 block, or raw JSON'
         required: true
         type: string
 

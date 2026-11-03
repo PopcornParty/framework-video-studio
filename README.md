@@ -8,17 +8,35 @@ Create videos by pasting a FRAMEWORK DNA v1 package into a GitHub Actions workfl
 
 1. Open the repository on GitHub.
 2. Go to **Actions** → **Render production** → **Run workflow**.
-3. Paste the complete FRAMEWORK DNA v1 block (including the wrapper markers) or raw JSON into the required **DNA** field.
+3. Paste one of the accepted DNA forms into the required **DNA** field.
 4. Tap **Run workflow**.
 
 When the run succeeds, a release is published containing the MP4 and a ZIP with the report. The job fails if validation, rendering, or ffprobe verification fails.
 
-## DNA format
+## DNA input formats
 
-The workflow accepts either:
+The workflow accepts any of these:
 
+- A single-line compact code starting with `FW1:` (gzip + Base64URL)
 - A wrapped block starting with `---FRAMEWORK DNA` and ending with `---END FRAMEWORK DNA---`
 - Raw JSON with `"schema": "framework-dna"` and `"schemaVersion": 1`
+
+Compact codes are decoded first. After that, the same schema, version, provenance, and asset checks run. A bad code never skips validation.
+
+### Make a compact code
+
+From a machine with Node:
+
+```bash
+node -e '
+const { gzipSync } = require("zlib")
+const fs = require("fs")
+const text = fs.readFileSync("dna.json", "utf8")
+process.stdout.write("FW1:" + gzipSync(Buffer.from(text)).toString("base64url"))
+'
+```
+
+Paste the resulting one-line `FW1:` code into the workflow input.
 
 External visuals must include a licence and known commercialUse. User-provided media folders are not accepted.
 

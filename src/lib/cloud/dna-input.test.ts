@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { extractJson, validateDna } from '../../../scripts/validate-dna.mjs'
+import { gzipSync } from 'node:zlib'
+import { extractJson, validateDna, encodeCompact, decodeCompact, COMPACT_PREFIX } from '../../../scripts/validate-dna.mjs'
 
 function wrap(obj: unknown): string {
   return `---FRAMEWORK DNA v1---\n${JSON.stringify(obj)}\n---END FRAMEWORK DNA---`
@@ -64,5 +65,53 @@ describe('DNA validation for GitHub Actions', () => {
     const text = extractJson(wrap(validBase))
     expect(text.startsWith('{')).toBe(true)
     expect(JSON.parse(text).schema).toBe('framework-dna')
+  })
+
+  it('accepts a valid compact FW1: code of raw JSON', () => {
+    const code = encodeCompact(JSON.stringify(validBase))
+    expect(code.startsWith(COMPACT_PREFIX)).toBe(true)
+    expect(code.includes('\n')).toBe(false)
+    const r = validateDna(code)
+    expect(r.ok).toBe(true)
+    if (r.ok) {
+      expect(r.dna.schema).toBe('framework-dna')
+      expect(r.dna.schemaVersion).toBe(1)
+      expect(r.dna.visuals?.[0]?.id).toBe('VIS-1')
+    }
+  })
+
+  it('accepts a valid compact FW1: code of a wrapped DNA block', () => {
+    const code = encodeCompact(wrap(validBase))
+    const r = validateDna(code)
+    expect(r.ok).toBe(true)
+    if (r.ok) expect(r.dna.request?.original).toBe('Test')
+  })
+
+  it('rejects a corrupted compact code', () => {
+    const corrupted = COMPACT_PREFIX + Buffer.from('this is not gzip data').toString('base64url')
+    const r = validateDna(corrupted)
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.errors.some(e => e.toLowerCase().includes('decompressed') || e.toLowerCase().includes('invalid'))).toBe(true)
+  })
+
+  it('rejects compact DNA that decodes to invalid JSON', () => {
+    const code = COMPACT_PREFIX + gzipSync(Buffer.from('{not valid json', 'utf8')).toString('base64url')
+    expect(decodeCompact(code)).toBe('{not valid json')
+    const r = validateDna(code)
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.errors.some(e => e.includes('valid JSON'))).toBe(true)
+  })
+
+  it('still rejects bad schema after a successful compact decode', () => {
+    const bad = { ...validBase, schema: 'not-framework' }
+    const r = validateDna(encodeCompact(JSON.stringify(bad)))
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.errors.some(e => e.includes('schema'))).toBe(true)
+  })
+
+  it('keeps backwards compatibility for existing raw JSON and wrapped blocks', () => {
+    expect(validateDna(JSON.stringify(validBase)).ok).toBe(true)
+    expect(validateDna(wrap(validBase)).ok).toBe(true)
+    expect(validateDna(JSON.stringify({ ...validBase, schemaVersion: 99 })).ok).toBe(false)
   })
 })
