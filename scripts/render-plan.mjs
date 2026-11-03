@@ -56,9 +56,9 @@ export function planMusic(dna, availableFiles = []) {
   const music = dna?.music
   if (!music || music.enabled === false) return { enabled: false }
   const files = new Set(availableFiles.map(f => String(f).toLowerCase()))
-  const volume = clamp(music.volume, 0.05, 0.4, 0.18)
-  const fadeInSec = clamp(music.fadeInSec, 0, 3, 0.4)
-  const fadeOutSec = clamp(music.fadeOutSec, 0, 4, 0.8)
+  const volume = clamp(music.volume, 0.4, 1.4, 1)
+  const fadeInSec = clamp(music.fadeInSec, 0, 3, 0.5)
+  const fadeOutSec = clamp(music.fadeOutSec, 0, 4, 1)
   const loop = music.loop !== false
   const licence = music.obtain?.licence || ''
   const commercialUse = music.obtain?.commercialUse || ''
@@ -70,7 +70,7 @@ export function planMusic(dna, availableFiles = []) {
     if (!licence || !commercialUse || commercialUse === 'unknown') {
       return { error: 'Music needs a licence and known commercialUse. Not substituting.' }
     }
-    return { enabled: true, kind: 'url', url, volume, fadeInSec, fadeOutSec, loop, licence, commercialUse, attribution }
+    return { enabled: true, kind: 'url', source: url, url, volume, fadeInSec, fadeOutSec, loop, licence, commercialUse, attribution }
   }
   if (music.origin === 'user-provided') {
     const name = music.originalFilename || ''
@@ -80,7 +80,7 @@ export function planMusic(dna, availableFiles = []) {
     if (!licence || !commercialUse || commercialUse === 'unknown') {
       return { error: 'User music needs a licence and known commercialUse. Not substituting.' }
     }
-    return { enabled: true, kind: 'file', file: name, volume, fadeInSec, fadeOutSec, loop, licence, commercialUse, attribution }
+    return { enabled: true, kind: 'file', source: `user-file:${name}`, file: name, volume, fadeInSec, fadeOutSec, loop, licence, commercialUse, attribution }
   }
   return { error: 'Music origin is unknown. Not substituting.' }
 }

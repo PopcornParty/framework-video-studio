@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
+import { mkdtemp, writeFile, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
 import { planJob } from '../../../scripts/render-plan.mjs'
+import { DELIVERABLES, stageDebug, stageDeliverables } from '../../../scripts/package-render.mjs'
 import {
   buildCues,
   phrasesOf,
@@ -70,10 +74,12 @@ describe('renderer upgrade', () => {
   it('accepts licensed music and preserves punctuation', () => {
     const r = planJob({
       ...base,
-      music: { enabled: true, origin: 'external', volume: 0.2, obtain: { url: 'https://example.com/a.mp3', licence: 'CC0', commercialUse: 'yes', attribution: 'Example' } },
+      music: { enabled: true, origin: 'external', volume: 0.8, obtain: { url: 'https://example.com/a.mp3', licence: 'CC0', commercialUse: 'yes', attribution: 'Example' } },
     })
     expect(r.ok).toBe(true)
     expect(r.music.licence).toBe('CC0')
+    expect(r.music.volume).toBe(0.8)
+    expect(r.music.source).toBe('https://example.com/a.mp3')
     expect(tokenize('Hello, world! How are you?')).toEqual(['Hello,', 'world!', 'How', 'are', 'you?'])
   })
 
@@ -116,6 +122,31 @@ describe('renderer upgrade', () => {
     expect(ass).toContain('\\fad')
     expect(ass).toContain('MarginV')
     expect(phrasesOf('One two three four five')).toEqual(['One two three', 'four five'])
+  })
+
+  it('defaults music to an audible normalized level and packages only deliverables', async () => {
+    const r = planJob({
+      ...base,
+      music: { enabled: true, origin: 'user-provided', originalFilename: 'song.mp3', obtain: { licence: 'owned', commercialUse: 'yes' } },
+    }, ['song.mp3'])
+    expect(r.ok).toBe(true)
+    expect(r.music.volume).toBe(1)
+    expect(r.music.source).toBe('user-file:song.mp3')
+
+    const dir = await mkdtemp(path.join(tmpdir(), 'fw-pack-'))
+    const dist = path.join(dir, 'dist')
+    const debug = path.join(dir, 'debug')
+    await writeFile(path.join(dir, 'video.mp4'), 'mp4')
+    await writeFile(path.join(dir, 'subtitles.srt'), 'srt')
+    await writeFile(path.join(dir, 'subtitles.ass'), 'ass')
+    await writeFile(path.join(dir, 'report.txt'), 'OK\nmusic=yes\n')
+    await writeFile(path.join(dir, 'music.bin'), 'audio')
+    await writeFile(path.join(dir, 'VIS-1.mp4'), 'scene')
+    const staged = await stageDeliverables(dir, dist)
+    const debugFiles = await stageDebug(dir, debug)
+    expect(staged).toEqual(DELIVERABLES)
+    expect(debugFiles.sort()).toEqual(['VIS-1.mp4', 'music.bin'])
+    await rm(dir, { recursive: true, force: true })
   })
 
   it('syncs a line to its scene and can disable subtitles', () => {

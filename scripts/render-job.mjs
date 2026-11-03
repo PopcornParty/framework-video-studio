@@ -115,14 +115,23 @@ async function main() {
     return fail(outDir, 'Subtitle timing does not fit the final video.')
   }
 
+  const loudness = plan.music?.enabled ? await measureLoudness(mp4) : { mean: null, max: null }
+  if (plan.music?.enabled && (loudness.mean == null || loudness.mean < -32)) {
+    return fail(outDir, `Music is present but too quiet (mean ${loudness.mean} dB). Not reporting success.`)
+  }
+
   const report = [
     'OK',
     `duration=${checked.duration}`,
     `shots=${plan.shots.map(s => s.id).join(',')}`,
     `subtitles=${cues.length}`,
     `music=${plan.music?.enabled ? 'yes' : 'no'}`,
+    `music_source=${plan.music?.source || ''}`,
     `music_licence=${plan.music?.licence || ''}`,
     `music_attribution=${plan.music?.attribution || ''}`,
+    `music_volume=${plan.music?.enabled ? plan.music.volume : ''}`,
+    `music_mean_db=${loudness.mean ?? ''}`,
+    `music_max_db=${loudness.max ?? ''}`,
     ...plan.shots.map(s => `visual ${s.id} licence=${s.licence} attribution=${s.attribution}`),
   ].join('\n') + '\n'
   await writeFile(path.join(outDir, 'report.txt'), report)
@@ -188,13 +197,30 @@ async function burnSubtitles(video, assPath, out) {
 
 async function mixMusic(video, music, out, duration, settings) {
   const fadeOutStart = Math.max(0, duration - settings.fadeOutSec)
+  // Normalize first so a quiet or hot source lands at a phone-audible level.
+  // volume 1 is that normalized level. It is not a hidden test tone.
   await run('ffmpeg', [
     '-y', '-i', video, '-stream_loop', '-1', '-i', music,
-    '-filter_complex', `[1:a]atrim=0:${duration},asetpts=PTS-STARTPTS,afade=t=in:st=0:d=${settings.fadeInSec},afade=t=out:st=${fadeOutStart}:d=${settings.fadeOutSec},volume=${settings.volume},alimiter=limit=0.9[a]`,
+    '-filter_complex', `[1:a]aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=0:${duration},asetpts=PTS-STARTPTS,loudnorm=I=-16:TP=-1.5:LRA=7,volume=${settings.volume},afade=t=in:st=0:d=${settings.fadeInSec},afade=t=out:st=${fadeOutStart}:d=${settings.fadeOutSec},alimiter=limit=0.95[a]`,
     '-map', '0:v', '-map', '[a]',
-    '-c:v', 'copy', '-c:a', 'aac', '-shortest',
+    '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-shortest',
     out,
   ])
+}
+
+async function measureLoudness(file) {
+  const err = await new Promise((resolve, reject) => {
+    const p = spawn('ffmpeg', ['-i', file, '-af', 'volumedetect', '-f', 'null', '-'], { stdio: ['ignore', 'ignore', 'pipe'] })
+    let text = ''
+    p.stderr.on('data', d => { text += d })
+    p.on('close', code => code === 0 ? resolve(text) : reject(new Error('volumedetect failed')))
+  })
+  const mean = err.match(/mean_volume:\s*(-?\d+(?:\.\d+)?) dB/)
+  const max = err.match(/max_volume:\s*(-?\d+(?:\.\d+)?) dB/)
+  return {
+    mean: mean ? Number(mean[1]) : null,
+    max: max ? Number(max[1]) : null,
+  }
 }
 
 async function probe(file) {
