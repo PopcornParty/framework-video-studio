@@ -4,12 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       dna:
-        description: 'Paste FRAMEWORK DNA v1 JSON. Leave empty if using job_path.'
-        required: false
-        type: string
-      job_path:
-        description: 'Optional repo folder with dna.json and media/, e.g. jobs/my-video'
-        required: false
+        description: 'Paste the complete FRAMEWORK DNA v1 block (including wrapper markers) or raw JSON'
+        required: true
         type: string
 
 permissions:
@@ -19,32 +15,27 @@ jobs:
   render:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
       - name: Validate DNA
         env:
           DNA: ${{ inputs.dna }}
-          JOB_PATH: ${{ inputs.job_path }}
         run: |
-          mkdir -p job/media render-out
-          if [ -n "$JOB_PATH" ]; then
-            case "$JOB_PATH" in
-              jobs/*) ;;
-              *) echo "job_path must start with jobs/"; exit 1 ;;
-            esac
-            test -f "$JOB_PATH/dna.json"
-            cp "$JOB_PATH/dna.json" job/dna.json
-            if [ -d "$JOB_PATH/media" ]; then cp -r "$JOB_PATH/media/." job/media/; fi
-          elif [ -n "$DNA" ]; then
-            printf '%s' "$DNA" > job/dna.json
-          else
+          mkdir -p job render-out
+          if [ -z "$DNA" ]; then
             printf 'FAILED\nNo DNA was provided.\n' > render-out/report.txt
+            echo "DNA input is required."
             exit 1
           fi
-          node -e "JSON.parse(require('fs').readFileSync('job/dna.json','utf8'))"
+          node scripts/validate-dna.mjs
+
       - name: Download assets and render
-        run: node scripts/render-job.mjs job/dna.json job/media render-out
+        run: node scripts/render-job.mjs job/dna.json "" render-out
+
       - name: Check MP4
         run: |
           test -f render-out/video.mp4
@@ -57,12 +48,14 @@ jobs:
           open('render-out/report.txt','a').write(f'mp4_bytes={size}\nchecked=ffprobe\n')
           print('checked', dur, size)
           PY
+
       - name: Package ZIP
         if: always()
         run: |
           cd render-out
           zip -r ../framework-render.zip .
           cp ../framework-render.zip .
+
       - name: Publish release
         if: success()
         env:
@@ -71,7 +64,8 @@ jobs:
           gh release create "render-${{ github.run_id }}" \
             render-out/video.mp4 render-out/framework-render.zip \
             --title "Render ${{ github.run_id }}" \
-            --notes "Real render. MP4 passed ffprobe."
+            --notes "Real render. MP4 passed ffprobe verification."
+
       - name: Upload artifact
         if: success()
         uses: actions/upload-artifact@v4

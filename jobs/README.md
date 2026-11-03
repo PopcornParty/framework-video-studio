@@ -1,11 +1,12 @@
 # Cloud render jobs
 
-Optional. Use this only when a video needs your own files.
+The GitHub Actions render workflow now accepts DNA only.
 
-1. Create a folder here, for example `jobs/my-video/`.
-2. Put `dna.json` in that folder.
-3. Put the original files ChatGPT selected in `jobs/my-video/media/`.
-4. Upload the folder with the GitHub website while logged in. Do not put a token in the app.
-5. Run the Render production workflow and set `job_path` to `jobs/my-video`.
+1. Open the repository on GitHub.
+2. Go to Actions → Render production → Run workflow.
+3. Paste the complete FRAMEWORK DNA v1 block (with wrapper markers) or raw JSON into the required DNA field.
+4. Tap Run workflow.
 
-Required files that are missing stop the render. External images are not used as substitutes.
+GitHub-hosted Ubuntu workers validate the DNA, fetch external assets listed in the package, render a real MP4 with FFmpeg, verify it with ffprobe, package a ZIP, and publish a release only if every step succeeds.
+
+User-provided media folders are no longer accepted. DNA that requires local files will fail validation rather than invent footage.

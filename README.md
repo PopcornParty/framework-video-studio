@@ -1,34 +1,29 @@
 # FRAMEWORK — Automated Video Production Studio
 
-A mobile-friendly video production application that creates storyboards from written prompts using a local media library of licensed stock footage, then renders real MP4 videos in the browser.
+Create videos by pasting a FRAMEWORK DNA v1 package into a GitHub Actions workflow. Ubuntu workers validate the DNA, fetch external assets, render a real MP4 with FFmpeg, verify it with ffprobe, and publish a ZIP only on success.
 
-**No external AI APIs. No paid services. Everything runs locally.**
+**No website, no frontend, no API tokens, no local installation required.**
 
-## Features (in progress)
+## Run a production on iPhone
 
-- Prompt interpretation engine (rule-based + synonym dictionaries)
-- Media library with IndexedDB persistence
-- Storyboard generation and editing
-- Browser-based rendering with FFmpeg.wasm
-- PWA support for iPhone Home Screen
-- GitHub Pages deployment
+1. Open the repository on GitHub.
+2. Go to **Actions** → **Render production** → **Run workflow**.
+3. Paste the complete FRAMEWORK DNA v1 block (including the wrapper markers) or raw JSON into the required **DNA** field.
+4. Tap **Run workflow**.
 
-## Tech Stack
+When the run succeeds, a release is published containing the MP4 and a ZIP with the report. The job fails if validation, rendering, or ffprobe verification fails.
 
-- React + TypeScript + Vite
-- Tailwind CSS
-- IndexedDB (via idb)
-- FFmpeg.wasm
-- React Router
-- vite-plugin-pwa
+## DNA format
 
-## Development
+The workflow accepts either:
 
-```bash
-npm install
-npm run dev
-```
+- A wrapped block starting with `---FRAMEWORK DNA` and ending with `---END FRAMEWORK DNA---`
+- Raw JSON with `"schema": "framework-dna"` and `"schemaVersion": 1`
 
-## Deployment
+External visuals must include a licence and known commercialUse. User-provided media folders are not accepted.
 
-Deployed via GitHub Actions to GitHub Pages.
+## Tech
+
+- GitHub Actions (`ubuntu-latest`)
+- FFmpeg + ffprobe
+- Pure Node validation and planning (`scripts/`)
