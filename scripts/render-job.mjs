@@ -1,8 +1,9 @@
 /** Cloud render. Fetches only planned URLs. Writes a real MP4 or fails. */
-import { mkdir, writeFile, readdir, readFile } from 'node:fs/promises'
+import { mkdir, writeFile, readdir, readFile, copyFile } from 'node:fs/promises'
 import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { planJob } from './render-plan.mjs'
+import { buildCues, toAss, toSrt, validateCues } from './subtitles.mjs'
 
 function run(cmd, args) {
   return new Promise((resolve, reject) => {
@@ -36,7 +37,7 @@ async function main() {
   await mkdir(outDir, { recursive: true })
   if (!plan.ok) return fail(outDir, plan.errors.join('\n'))
 
-  const inputs = []
+  const images = []
   for (const shot of plan.shots) {
     const dest = path.join(outDir, `${shot.id}.img`)
     if (shot.kind === 'url') {
@@ -49,35 +50,161 @@ async function main() {
       if (!res.ok) return fail(outDir, `Could not fetch ${shot.id}: HTTP ${res.status} ${shot.url}`)
       await writeFile(dest, Buffer.from(await res.arrayBuffer()))
     } else {
-      const src = path.join(mediaDir, shot.file)
-      await writeFile(dest, await readFile(src))
+      await copyFile(path.join(mediaDir, shot.file), dest)
     }
-    inputs.push(dest)
+    images.push(dest)
   }
 
-  const args = []
-  for (const f of inputs) args.push('-loop', '1', '-t', '3', '-i', f)
-  const filters = inputs.map((_, i) =>
-    `[${i}:v]scale=720:1280:force_original_aspect_ratio=decrease,pad=720:1280:(ow-iw)/2:(oh-ih)/2,setsar=1[v${i}]`
-  ).join(';')
-  const concat = inputs.map((_, i) => `[v${i}]`).join('') + `concat=n=${inputs.length}:v=1:a=0[out]`
+  const scenes = []
+  for (let i = 0; i < plan.shots.length; i++) {
+    const shot = plan.shots[i]
+    const frames = Math.round(shot.durationSec * plan.edit.fps)
+    const scene = path.join(outDir, `${shot.id}.mp4`)
+    await renderScene(images[i], scene, frames, motionFor(shot, i), plan.edit)
+    scenes.push(scene)
+  }
+
+  const joined = path.join(outDir, 'joined.mp4')
+  await joinScenes(scenes, plan.shots.map(s => s.durationSec), plan.edit, joined)
+
+  const probeJoined = await probe(joined)
+  const { cues, settings } = buildCues(dna, plan.shots, plan.edit.transitionSec)
+  const timingErrors = validateCues(cues, probeJoined.duration)
+  if (timingErrors.length) return fail(outDir, timingErrors.join('\n'))
+  const srt = toSrt(cues)
+  const ass = toAss(cues, settings)
+  await writeFile(path.join(outDir, 'subtitles.srt'), srt)
+  await writeFile(path.join(outDir, 'subtitles.ass'), ass)
+
+  const burned = path.join(outDir, 'burned.mp4')
+  if (cues.length) {
+    await burnSubtitles(joined, path.join(outDir, 'subtitles.ass'), burned)
+  } else {
+    await copyFile(joined, burned)
+  }
+
+  let musicPath = ''
+  if (plan.music?.enabled) {
+    musicPath = path.join(outDir, 'music.bin')
+    if (plan.music.kind === 'url') {
+      const res = await fetch(plan.music.url, {
+        headers: { 'User-Agent': 'FRAMEWORKVideoStudio/0.1 (https://github.com/PopcornParty/framework-video-studio)' },
+      })
+      if (!res.ok) return fail(outDir, `Could not fetch music: HTTP ${res.status}. Not substituting.`)
+      await writeFile(musicPath, Buffer.from(await res.arrayBuffer()))
+    } else {
+      await copyFile(path.join(mediaDir, plan.music.file), musicPath)
+    }
+  }
+
   const mp4 = path.join(outDir, 'video.mp4')
-  await run('ffmpeg', [
-    '-y', ...args,
-    '-filter_complex', `${filters};${concat}`,
-    '-map', '[out]',
-    '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', '30',
-    mp4,
-  ])
-  const probe = await run('ffprobe', [
-    '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', mp4,
-  ])
-  const duration = Number(probe.trim())
-  if (!Number.isFinite(duration) || duration <= 0) {
+  if (plan.music?.enabled) {
+    await mixMusic(burned, musicPath, mp4, probeJoined.duration, plan.music)
+  } else {
+    await copyFile(burned, mp4)
+  }
+
+  const checked = await probe(mp4)
+  if (!Number.isFinite(checked.duration) || checked.duration <= 0) {
     return fail(outDir, 'ffprobe found no playable duration. Not reporting success.')
   }
-  await writeFile(path.join(outDir, 'report.txt'), `OK\nduration=${duration}\nshots=${plan.shots.map(s => s.id).join(',')}\n`)
-  console.log(`Rendered ${mp4} (${duration}s)`)
+  if (plan.music?.enabled && !checked.hasAudio) {
+    return fail(outDir, 'Music was requested but the MP4 has no audio stream.')
+  }
+  if (cues.length && validateCues(cues, checked.duration).length) {
+    return fail(outDir, 'Subtitle timing does not fit the final video.')
+  }
+
+  const report = [
+    'OK',
+    `duration=${checked.duration}`,
+    `shots=${plan.shots.map(s => s.id).join(',')}`,
+    `subtitles=${cues.length}`,
+    `music=${plan.music?.enabled ? 'yes' : 'no'}`,
+    `music_licence=${plan.music?.licence || ''}`,
+    `music_attribution=${plan.music?.attribution || ''}`,
+    ...plan.shots.map(s => `visual ${s.id} licence=${s.licence} attribution=${s.attribution}`),
+  ].join('\n') + '\n'
+  await writeFile(path.join(outDir, 'report.txt'), report)
+  console.log(`Rendered ${mp4} (${checked.duration}s, ${cues.length} cues)`)
+}
+
+function motionFor(shot, index) {
+  if (shot.motion) return shot.motion
+  return ['zoom-in', 'pan-right', 'pan-left'][index % 3]
+}
+
+async function renderScene(image, out, frames, motion, edit) {
+  const zoom = motion === 'none' ? '1' : motion === 'zoom-in' ? 'min(1.10,1+0.0009*on)' : '1.05'
+  const x = motion === 'pan-right'
+    ? 'iw/2-(iw/zoom/2)+on*0.45'
+    : motion === 'pan-left'
+      ? 'iw/2-(iw/zoom/2)-on*0.45'
+      : 'iw/2-(iw/zoom/2)'
+  await run('ffmpeg', [
+    '-y', '-loop', '1', '-i', image,
+    '-vf', `scale=${edit.width}:${edit.height}:force_original_aspect_ratio=increase,crop=${edit.width}:${edit.height},zoompan=z='${zoom}':x='${x}':y='ih/2-(ih/zoom/2)':d=${frames}:s=${edit.width}x${edit.height}:fps=${edit.fps}`,
+    '-frames:v', String(frames),
+    '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', String(edit.fps),
+    out,
+  ])
+}
+
+async function joinScenes(files, durations, edit, out) {
+  if (files.length === 1) {
+    await copyFile(files[0], out)
+    return
+  }
+  const trans = edit.transition === 'none' ? 0 : edit.transitionSec
+  if (trans <= 0) {
+    const list = files.map(f => `file '${f.replace(/'/g, "'\\''")}'`).join('\n')
+    const listPath = path.join(path.dirname(out), 'concat.txt')
+    await writeFile(listPath, list)
+    await run('ffmpeg', ['-y', '-f', 'concat', '-safe', '0', '-i', listPath, '-c', 'copy', out])
+    return
+  }
+  const args = ['-y']
+  for (const file of files) args.push('-i', file)
+  let offset = durations[0] - trans
+  let filter = `[0:v][1:v]xfade=transition=fade:duration=${trans}:offset=${offset.toFixed(3)}[x1]`
+  for (let i = 2; i < files.length; i++) {
+    offset += durations[i - 1] - trans
+    filter += `;[x${i - 1}][${i}:v]xfade=transition=fade:duration=${trans}:offset=${offset.toFixed(3)}[x${i}]`
+  }
+  args.push('-filter_complex', filter, '-map', `[x${files.length - 1}]`, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', String(edit.fps), out)
+  await run('ffmpeg', args)
+}
+
+async function burnSubtitles(video, assPath, out) {
+  const escaped = assPath.replace(/\\/g, '\\\\').replace(/:/g, '\\:').replace(/'/g, "\\'")
+  const fonts = '/usr/share/fonts/truetype/liberation2'
+  await run('ffmpeg', [
+    '-y', '-i', video,
+    '-vf', `ass='${escaped}':fontsdir='${fonts}'`,
+    '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
+    out,
+  ])
+}
+
+async function mixMusic(video, music, out, duration, settings) {
+  const fadeOutStart = Math.max(0, duration - settings.fadeOutSec)
+  await run('ffmpeg', [
+    '-y', '-i', video, '-stream_loop', '-1', '-i', music,
+    '-filter_complex', `[1:a]atrim=0:${duration},asetpts=PTS-STARTPTS,afade=t=in:st=0:d=${settings.fadeInSec},afade=t=out:st=${fadeOutStart}:d=${settings.fadeOutSec},volume=${settings.volume},alimiter=limit=0.9[a]`,
+    '-map', '0:v', '-map', '[a]',
+    '-c:v', 'copy', '-c:a', 'aac', '-shortest',
+    out,
+  ])
+}
+
+async function probe(file) {
+  const duration = Number((await run('ffprobe', [
+    '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', file,
+  ])).trim())
+  const streams = await run('ffprobe', [
+    '-v', 'error', '-show_entries', 'stream=codec_type', '-of', 'csv=p=0', file,
+  ])
+  return { duration, hasAudio: streams.split('\n').some(line => line.trim() === 'audio') }
 }
 
 main().catch(async err => {

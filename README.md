@@ -38,7 +38,17 @@ process.stdout.write("FW1:" + gzipSync(Buffer.from(text)).toString("base64url"))
 
 Paste the resulting one-line `FW1:` code into the workflow input.
 
-External visuals must include a licence and known commercialUse. User-provided media folders are not accepted.
+## Subtitles and music
+
+Optional DNA fields extend v1 without breaking older packages.
+
+- `script.lines` become phrase-timed subtitles. Each line can set `startSec`, `endSec`, `sceneId`, and `highlight`.
+- `subtitles.style` can be `clean`, `bold-box`, `outline`, or `karaoke`. Size, colour, outline, shadow, and margins are optional.
+- The renderer writes `subtitles.srt` and `subtitles.ass`, then burns the ASS captions into the MP4.
+- `music` may be an external https file or a user-provided file. It needs a licence and known `commercialUse`. Missing or unlicensed music fails the job; nothing is substituted.
+- `visuals[].durationSec` and `visuals[].motion` control pacing. Images are covered to 1080x1920, with a short fade and subtle movement.
+
+Older DNA with only licensed visuals still renders, using four-second scenes and no music.
 
 ## Tech
 
