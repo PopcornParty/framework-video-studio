@@ -4,6 +4,7 @@ import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { planJob } from './render-plan.mjs'
 import { buildCues, toAss, toSrt, validateCues } from './subtitles.mjs'
+import { downloadShots, fetchWithRetry } from './fetch-asset.mjs'
 
 function run(cmd, args) {
   return new Promise((resolve, reject) => {
@@ -37,24 +38,21 @@ async function main() {
   await mkdir(outDir, { recursive: true })
   if (!plan.ok) return fail(outDir, plan.errors.join('\n'))
 
+  const cache = new Map()
+  const downloaded = await downloadShots(plan.shots, { cache })
   const assets = []
-  for (let i = 0; i < plan.shots.length; i++) {
-    const shot = plan.shots[i]
+  for (let i = 0; i < downloaded.results.length; i++) {
+    const item = downloaded.results[i]
+    const shot = item.shot
     const dest = path.join(outDir, `${safe(shot.id)}-${i}.media`)
     if (shot.kind === 'url') {
-      const res = await fetch(shot.url, {
-        headers: {
-          'User-Agent': 'FRAMEWORKVideoStudio/0.1 (https://github.com/PopcornParty/framework-video-studio)',
-          'Accept': 'image/avif,image/webp,image/apng,image/*,video/*,*/*;q=0.8',
-        },
-      })
-      if (!res.ok) return fail(outDir, `Could not fetch ${shot.id}: HTTP ${res.status} ${shot.url}`)
-      await writeFile(dest, Buffer.from(await res.arrayBuffer()))
+      if (!item.ok) return fail(outDir, item.error || `Could not fetch ${shot.id}: HTTP ${item.status || 'unknown'} ${shot.url}`)
+      await writeFile(dest, item.bytes)
     } else {
       await copyFile(path.join(mediaDir, shot.file), dest)
     }
     assets.push(dest)
-    await progress(outDir, `fetched ${i + 1}/${plan.shots.length}`)
+    await progress(outDir, `fetched ${i + 1}/${plan.shots.length}${item.cached ? ' cached' : ''}`)
   }
 
   const scenes = []
@@ -91,11 +89,9 @@ async function main() {
   if (plan.music?.enabled) {
     musicPath = path.join(outDir, 'music.bin')
     if (plan.music.kind === 'url') {
-      const res = await fetch(plan.music.url, {
-        headers: { 'User-Agent': 'FRAMEWORKVideoStudio/0.1 (https://github.com/PopcornParty/framework-video-studio)' },
-      })
-      if (!res.ok) return fail(outDir, `Could not fetch music: HTTP ${res.status}. Not substituting.`)
-      await writeFile(musicPath, Buffer.from(await res.arrayBuffer()))
+      const fetched = await fetchWithRetry(plan.music.url, { sceneId: 'music', cache })
+      if (!fetched.ok) return fail(outDir, `${fetched.error}. Not substituting.`)
+      await writeFile(musicPath, fetched.bytes)
     } else {
       await copyFile(path.join(mediaDir, plan.music.file), musicPath)
     }
