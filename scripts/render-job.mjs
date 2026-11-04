@@ -208,7 +208,7 @@ async function joinScenes(files, shots, edit, out, outDir) {
 }
 
 async function concatPair(a, b, out) {
-  const list = `file '${a.replace(/'/g, "'\\''")}'\nfile '${b.replace(/'/g, "'\\''")}'\n`
+  const list = [a, b].map(file => `file '${path.resolve(file).replace(/'/g, "'\\''")}'`).join('\n') + '\n'
   const listPath = `${out}.txt`
   await writeFile(listPath, list)
   await run('ffmpeg', ['-y', '-f', 'concat', '-safe', '0', '-i', listPath, '-c', 'copy', out])
