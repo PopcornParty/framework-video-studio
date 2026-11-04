@@ -1,0 +1,1012 @@
+{
+  "schema": "framework-dna",
+  "schemaVersion": 1,
+  "request": {
+    "original": "Create a 15-second vertical fast-paced edit featuring 30 dream supercars, 30 different cars, no subtitles, clean cinematic car visuals, mostly hard cuts and a handful of intentional high-energy transitions. End with WHICH ONE ARE YOU TAKING?",
+    "durationSec": 15,
+    "format": "1080x1920",
+    "platform": "YouTube Shorts"
+  },
+  "research": {
+    "subject": "30 dream supercars visual montage",
+    "sources": [
+      {
+        "id": "S01",
+        "label": "McLaren P1 \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:McLaren_P1_SCD_24.jpg"
+      },
+      {
+        "id": "S02",
+        "label": "Ferrari F40 \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:1989_Ferrari_F40_SCD_24.jpg"
+      },
+      {
+        "id": "S03",
+        "label": "Lamborghini Sesto Elemento \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2012_Lamborghini_Sesto_Elemento_SCD_24.jpg"
+      },
+      {
+        "id": "S04",
+        "label": "Bugatti Centodieci \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2022_Bugatti_Centodieci_SCD_24.jpg"
+      },
+      {
+        "id": "S05",
+        "label": "Koenigsegg Regera \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2022_Koenigsegg_Regera_SCD_24.jpg"
+      },
+      {
+        "id": "S06",
+        "label": "Aston Martin Valkyrie \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:Aston_Martin_Valkyrie_side_detail_SCD_24.jpg"
+      },
+      {
+        "id": "S07",
+        "label": "Pagani Huayra V Edizione \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2013_Pagani_Huayra_V_Edizione_SCD24.jpg"
+      },
+      {
+        "id": "S08",
+        "label": "Porsche 918 Spyder \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2014_Porsche_918_Spyder_Blue_SCD_24.jpg"
+      },
+      {
+        "id": "S09",
+        "label": "Ford GT \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2005_Ford_GT_SCD24.jpg"
+      },
+      {
+        "id": "S10",
+        "label": "McLaren 720S \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:McLaren_720S_SCD_24.jpg"
+      },
+      {
+        "id": "S11",
+        "label": "Lamborghini Revuelto \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:Red_2024_Lamborghini_Revuelto_SCD_24.jpg"
+      },
+      {
+        "id": "S12",
+        "label": "Ferrari 166 MM \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:1950_Ferrari_166_MM_Touring_Berlinetta_SCD_24.jpg"
+      },
+      {
+        "id": "S13",
+        "label": "Bugatti Veyron \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2008_Bugatti_Veyron_16.4_SCD_24.jpg"
+      },
+      {
+        "id": "S14",
+        "label": "Porsche 993 Turbo \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:Porsche_993_Turbo_SCD_24.jpg"
+      },
+      {
+        "id": "S15",
+        "label": "Koenigsegg CCX \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2006_Koenigsegg_CCX_SCD24.jpg"
+      },
+      {
+        "id": "S16",
+        "label": "Aston Martin One-77 \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2011_Aston_Martin_One-77_SCD_24.jpg"
+      },
+      {
+        "id": "S17",
+        "label": "Lamborghini Hurac\u00e1n STO \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:Lamborghini_Huracan_STO_SCD_24.jpg"
+      },
+      {
+        "id": "S18",
+        "label": "Pagani Zonda \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2008_Pagani_Zonda_Attack_SCD24.jpg"
+      },
+      {
+        "id": "S19",
+        "label": "McLaren 650S Spider \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2014_McLaren_650S_Spider_SCD_24.jpg"
+      },
+      {
+        "id": "S20",
+        "label": "Porsche 911 GT3 RS \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:Porsche_992_GT3_RS_SCD_24.jpg"
+      },
+      {
+        "id": "S21",
+        "label": "Lamborghini Murci\u00e9lago \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2004_Lamborghini_Murcielago_SCD_24.jpg"
+      },
+      {
+        "id": "S22",
+        "label": "Aston Martin V12 Vantage \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2022_Aston_Martin_V12_Vantage_SCD_24.jpg"
+      },
+      {
+        "id": "S23",
+        "label": "Bugatti Veyron Grand Sport Vitesse \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2013_Bugatti_Veyron_Grand_Sport_Vitesse_SCD_24.jpg"
+      },
+      {
+        "id": "S24",
+        "label": "Porsche 911 GT3 \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2024_Porsche_911_GT3_SCD_24.jpg"
+      },
+      {
+        "id": "S25",
+        "label": "Lamborghini Aventador \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2013_Lamborghini_Aventador_LP700-4_SCD_24.jpg"
+      },
+      {
+        "id": "S26",
+        "label": "McLaren MP4-12C Spider \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2013_McLaren_MP4-12C_Spider_SCD_24.jpg"
+      },
+      {
+        "id": "S27",
+        "label": "Lamborghini Gallardo \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:Black_Lamborghini_Gallardo_SCD_24.jpg"
+      },
+      {
+        "id": "S28",
+        "label": "Koenigsegg Agera S \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2012_Koenigsegg_Agera_S_HCC24.jpg"
+      },
+      {
+        "id": "S29",
+        "label": "Koenigsegg CCXR Edition \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2008_Koenigsegg_CCXR_Edition_SCD_24.jpg"
+      },
+      {
+        "id": "S30",
+        "label": "Lamborghini Revent\u00f3n \u2014 MrWalkr, Wikimedia Commons, CC BY-SA 4.0",
+        "url": "https://commons.wikimedia.org/wiki/File:2008_Lamborghini_Reventon_SCD_24.jpg"
+      }
+    ],
+    "facts": []
+  },
+  "storytelling": {
+    "structureId": "montage",
+    "hookId": "instant-car-montage",
+    "reason": "Thirty rapid supercar shots with an opening title and a final engagement prompt."
+  },
+  "script": {
+    "lines": []
+  },
+  "visuals": [
+    {
+      "id": "V01",
+      "origin": "external",
+      "depicts": "McLaren P1",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/McLaren_P1_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V02",
+      "origin": "external",
+      "depicts": "Ferrari F40",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/1989_Ferrari_F40_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V03",
+      "origin": "external",
+      "depicts": "Lamborghini Sesto Elemento",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2012_Lamborghini_Sesto_Elemento_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V04",
+      "origin": "external",
+      "depicts": "Bugatti Centodieci",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2022_Bugatti_Centodieci_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V05",
+      "origin": "external",
+      "depicts": "Koenigsegg Regera",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2022_Koenigsegg_Regera_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V06",
+      "origin": "external",
+      "depicts": "Aston Martin Valkyrie",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Aston_Martin_Valkyrie_side_detail_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V07",
+      "origin": "external",
+      "depicts": "Pagani Huayra V Edizione",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2013_Pagani_Huayra_V_Edizione_SCD24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V08",
+      "origin": "external",
+      "depicts": "Porsche 918 Spyder",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2014_Porsche_918_Spyder_Blue_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V09",
+      "origin": "external",
+      "depicts": "Ford GT",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2005_Ford_GT_SCD24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V10",
+      "origin": "external",
+      "depicts": "McLaren 720S",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/McLaren_720S_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V11",
+      "origin": "external",
+      "depicts": "Lamborghini Revuelto",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Red_2024_Lamborghini_Revuelto_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V12",
+      "origin": "external",
+      "depicts": "Ferrari 166 MM",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/1950_Ferrari_166_MM_Touring_Berlinetta_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V13",
+      "origin": "external",
+      "depicts": "Bugatti Veyron",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2008_Bugatti_Veyron_16.4_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V14",
+      "origin": "external",
+      "depicts": "Porsche 993 Turbo",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Porsche_993_Turbo_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V15",
+      "origin": "external",
+      "depicts": "Koenigsegg CCX",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2006_Koenigsegg_CCX_SCD24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V16",
+      "origin": "external",
+      "depicts": "Aston Martin One-77",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2011_Aston_Martin_One-77_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V17",
+      "origin": "external",
+      "depicts": "Lamborghini Hurac\u00e1n STO",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Lamborghini_Huracan_STO_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V18",
+      "origin": "external",
+      "depicts": "Pagani Zonda",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2008_Pagani_Zonda_Attack_SCD24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V19",
+      "origin": "external",
+      "depicts": "McLaren 650S Spider",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2014_McLaren_650S_Spider_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V20",
+      "origin": "external",
+      "depicts": "Porsche 911 GT3 RS",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Porsche_992_GT3_RS_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V21",
+      "origin": "external",
+      "depicts": "Lamborghini Murci\u00e9lago",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2004_Lamborghini_Murcielago_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V22",
+      "origin": "external",
+      "depicts": "Aston Martin V12 Vantage",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2022_Aston_Martin_V12_Vantage_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V23",
+      "origin": "external",
+      "depicts": "Bugatti Veyron Grand Sport Vitesse",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Bugatti_Veyron_Grand_Sport_Vitesse_Musee_National_Automobile.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "MrWalkr, own work, Wikimedia Commons, CC BY-SA 4.0. Bugatti Veyron Grand Sport Vitesse at the Mus\u00e9e National de l'Automobile.",
+        "source": "https://commons.wikimedia.org/wiki/File:Bugatti_Veyron_Grand_Sport_Vitesse_Musee_National_Automobile.jpg"
+      }
+    },
+    {
+      "id": "V24",
+      "origin": "external",
+      "depicts": "Porsche 911 GT3",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2024_Porsche_911_GT3_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V25",
+      "origin": "external",
+      "depicts": "Lamborghini Aventador",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2013_Lamborghini_Aventador_LP700-4_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V26",
+      "origin": "external",
+      "depicts": "McLaren MP4-12C Spider",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2013_McLaren_MP4-12C_Spider_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V27",
+      "origin": "external",
+      "depicts": "Lamborghini Gallardo",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/Black_Lamborghini_Gallardo_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V28",
+      "origin": "external",
+      "depicts": "Koenigsegg Agera S",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2012_Koenigsegg_Agera_S_HCC24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V29",
+      "origin": "external",
+      "depicts": "Koenigsegg CCXR Edition",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2008_Koenigsegg_CCXR_Edition_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    },
+    {
+      "id": "V30",
+      "origin": "external",
+      "depicts": "Lamborghini Revent\u00f3n",
+      "required": true,
+      "mediaType": "image/jpeg",
+      "obtain": {
+        "method": "Wikimedia Commons direct file",
+        "url": "https://commons.wikimedia.org/wiki/Special:FilePath/2008_Lamborghini_Reventon_SCD_24.jpg",
+        "licence": "CC BY-SA 4.0",
+        "commercialUse": "yes",
+        "attribution": "Photo: MrWalkr / Wikimedia Commons, CC BY-SA 4.0; cropped for this edit."
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "SC01",
+      "visualId": "V01",
+      "durationSec": 0.8,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      },
+      "text": "30 DREAM SUPERCARS"
+    },
+    {
+      "id": "SC02",
+      "visualId": "V02",
+      "durationSec": 0.5,
+      "motion": "pan-left",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC03",
+      "visualId": "V03",
+      "durationSec": 0.5,
+      "motion": "pan-right",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "whip-left",
+        "durationSec": 0.1,
+        "intensity": 0.9
+      }
+    },
+    {
+      "id": "SC04",
+      "visualId": "V04",
+      "durationSec": 0.5,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC05",
+      "visualId": "V05",
+      "durationSec": 0.5,
+      "motion": "none",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC06",
+      "visualId": "V06",
+      "durationSec": 0.5,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC07",
+      "visualId": "V07",
+      "durationSec": 0.5,
+      "motion": "pan-left",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC08",
+      "visualId": "V08",
+      "durationSec": 0.5,
+      "motion": "pan-right",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "zoom",
+        "durationSec": 0.1,
+        "intensity": 0.85
+      }
+    },
+    {
+      "id": "SC09",
+      "visualId": "V09",
+      "durationSec": 0.5,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC10",
+      "visualId": "V10",
+      "durationSec": 0.5,
+      "motion": "none",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC11",
+      "visualId": "V11",
+      "durationSec": 0.5,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC12",
+      "visualId": "V12",
+      "durationSec": 0.5,
+      "motion": "pan-left",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC13",
+      "visualId": "V13",
+      "durationSec": 0.5,
+      "motion": "pan-right",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "flash",
+        "durationSec": 0.1,
+        "intensity": 0.7
+      }
+    },
+    {
+      "id": "SC14",
+      "visualId": "V14",
+      "durationSec": 0.5,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC15",
+      "visualId": "V15",
+      "durationSec": 0.5,
+      "motion": "none",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC16",
+      "visualId": "V16",
+      "durationSec": 0.5,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC17",
+      "visualId": "V17",
+      "durationSec": 0.5,
+      "motion": "pan-left",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC18",
+      "visualId": "V18",
+      "durationSec": 0.5,
+      "motion": "pan-right",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "zoom-blur",
+        "durationSec": 0.1,
+        "intensity": 0.8
+      }
+    },
+    {
+      "id": "SC19",
+      "visualId": "V19",
+      "durationSec": 0.5,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC20",
+      "visualId": "V20",
+      "durationSec": 0.5,
+      "motion": "none",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC21",
+      "visualId": "V21",
+      "durationSec": 0.5,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC22",
+      "visualId": "V22",
+      "durationSec": 0.5,
+      "motion": "pan-left",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC23",
+      "visualId": "V23",
+      "durationSec": 0.5,
+      "motion": "pan-right",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "whip-right",
+        "durationSec": 0.1,
+        "intensity": 0.9
+      }
+    },
+    {
+      "id": "SC24",
+      "visualId": "V24",
+      "durationSec": 0.5,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC25",
+      "visualId": "V25",
+      "durationSec": 0.5,
+      "motion": "none",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC26",
+      "visualId": "V26",
+      "durationSec": 0.5,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC27",
+      "visualId": "V27",
+      "durationSec": 0.5,
+      "motion": "pan-left",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "glitch",
+        "durationSec": 0.1,
+        "intensity": 0.65
+      }
+    },
+    {
+      "id": "SC28",
+      "visualId": "V28",
+      "durationSec": 0.5,
+      "motion": "pan-right",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC29",
+      "visualId": "V29",
+      "durationSec": 0.5,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC30",
+      "visualId": "V30",
+      "durationSec": 0.8,
+      "motion": "none",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      },
+      "text": "WHICH ONE ARE YOU TAKING?"
+    }
+  ],
+  "edit": {
+    "transition": "cut"
+  },
+  "subtitles": {
+    "enabled": false
+  },
+  "music": {
+    "enabled": false
+  }
+}
