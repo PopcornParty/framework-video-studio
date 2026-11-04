@@ -37,14 +37,15 @@ async function main() {
   await mkdir(outDir, { recursive: true })
   if (!plan.ok) return fail(outDir, plan.errors.join('\n'))
 
-  const images = []
-  for (const shot of plan.shots) {
-    const dest = path.join(outDir, `${shot.id}.img`)
+  const assets = []
+  for (let i = 0; i < plan.shots.length; i++) {
+    const shot = plan.shots[i]
+    const dest = path.join(outDir, `${safe(shot.id)}-${i}.media`)
     if (shot.kind === 'url') {
       const res = await fetch(shot.url, {
         headers: {
           'User-Agent': 'FRAMEWORKVideoStudio/0.1 (https://github.com/PopcornParty/framework-video-studio)',
-          'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+          'Accept': 'image/avif,image/webp,image/apng,image/*,video/*,*/*;q=0.8',
         },
       })
       if (!res.ok) return fail(outDir, `Could not fetch ${shot.id}: HTTP ${res.status} ${shot.url}`)
@@ -52,23 +53,26 @@ async function main() {
     } else {
       await copyFile(path.join(mediaDir, shot.file), dest)
     }
-    images.push(dest)
+    assets.push(dest)
+    await progress(outDir, `fetched ${i + 1}/${plan.shots.length}`)
   }
 
   const scenes = []
   for (let i = 0; i < plan.shots.length; i++) {
     const shot = plan.shots[i]
-    const frames = Math.round(shot.durationSec * plan.edit.fps)
-    const scene = path.join(outDir, `${shot.id}.mp4`)
-    await renderScene(images[i], scene, frames, motionFor(shot, i), plan.edit)
+    const frames = Math.max(1, Math.round(shot.durationSec * plan.edit.fps))
+    const scene = path.join(outDir, `${safe(shot.id)}-${i}.mp4`)
+    if (shot.media === 'video') await renderVideo(assets[i], scene, shot, plan.edit)
+    else await renderScene(assets[i], scene, frames, motionFor(shot, i), plan.edit, shot)
     scenes.push(scene)
+    await progress(outDir, `rendered scene ${i + 1}/${plan.shots.length}`)
   }
 
   const joined = path.join(outDir, 'joined.mp4')
-  await joinScenes(scenes, plan.shots.map(s => s.durationSec), plan.edit, joined)
+  await joinScenes(scenes, plan.shots, plan.edit, joined, outDir)
 
   const probeJoined = await probe(joined)
-  const { cues, settings } = buildCues(dna, plan.shots, plan.edit.transitionSec)
+  const { cues, settings } = buildCues(dna, plan.shots, 0)
   const timingErrors = validateCues(cues, probeJoined.duration)
   if (timingErrors.length) return fail(outDir, timingErrors.join('\n'))
   const srt = toSrt(cues)
@@ -123,7 +127,7 @@ async function main() {
   const report = [
     'OK',
     `duration=${checked.duration}`,
-    `shots=${plan.shots.map(s => s.id).join(',')}`,
+    `transitions=${plan.shots.slice(0, -1).map(s => s.transition.type).join(',')}`,
     `subtitles=${cues.length}`,
     `music=${plan.music?.enabled ? 'yes' : 'no'}`,
     `music_source=${plan.music?.source || ''}`,
@@ -143,45 +147,87 @@ function motionFor(shot, index) {
   return ['zoom-in', 'pan-right', 'pan-left'][index % 3]
 }
 
-async function renderScene(image, out, frames, motion, edit) {
+async function renderScene(image, out, frames, motion, edit, shot) {
   const zoom = motion === 'none' ? '1' : motion === 'zoom-in' ? 'min(1.10,1+0.0009*on)' : '1.05'
   const x = motion === 'pan-right'
     ? 'iw/2-(iw/zoom/2)+on*0.45'
     : motion === 'pan-left'
       ? 'iw/2-(iw/zoom/2)-on*0.45'
       : 'iw/2-(iw/zoom/2)'
+  const focus = cropFocus(shot?.crop)
   await run('ffmpeg', [
     '-y', '-loop', '1', '-i', image,
-    '-vf', `scale=${edit.width}:${edit.height}:force_original_aspect_ratio=increase,crop=${edit.width}:${edit.height},zoompan=z='${zoom}':x='${x}':y='ih/2-(ih/zoom/2)':d=${frames}:s=${edit.width}x${edit.height}:fps=${edit.fps}`,
+    '-vf', `scale=${edit.width}:${edit.height}:force_original_aspect_ratio=increase,crop=${edit.width}:${edit.height}:${focus.x}:${focus.y},zoompan=z='${zoom}':x='${x}':y='ih/2-(ih/zoom/2)':d=${frames}:s=${edit.width}x${edit.height}:fps=${edit.fps}`,
     '-frames:v', String(frames),
-    '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', String(edit.fps),
+    '-c:v', 'libx264', '-preset', 'veryfast', '-pix_fmt', 'yuv420p', '-r', String(edit.fps),
     out,
   ])
 }
 
-async function joinScenes(files, durations, edit, out) {
+async function renderVideo(file, out, shot, edit) {
+  const focus = cropFocus(shot.crop)
+  const speed = shot.speed || 1
+  await run('ffmpeg', [
+    '-y', '-i', file,
+    '-vf', `scale=${edit.width}:${edit.height}:force_original_aspect_ratio=increase,crop=${edit.width}:${edit.height}:${focus.x}:${focus.y},setpts=${(1 / speed).toFixed(4)}*PTS`,
+    '-t', String(shot.durationSec),
+    '-an',
+    '-c:v', 'libx264', '-preset', 'veryfast', '-pix_fmt', 'yuv420p', '-r', String(edit.fps),
+    out,
+  ])
+}
+
+async function joinScenes(files, shots, edit, out, outDir) {
   if (files.length === 1) {
     await copyFile(files[0], out)
     return
   }
-  const trans = edit.transition === 'none' ? 0 : edit.transitionSec
-  if (trans <= 0) {
-    const list = files.map(f => `file '${f.replace(/'/g, "'\\''")}'`).join('\n')
-    const listPath = path.join(path.dirname(out), 'concat.txt')
-    await writeFile(listPath, list)
-    await run('ffmpeg', ['-y', '-f', 'concat', '-safe', '0', '-i', listPath, '-c', 'copy', out])
-    return
+  let current = files[0]
+  let currentDuration = shots[0].durationSec
+  for (let i = 1; i < files.length; i++) {
+    const transition = shots[i - 1].transition
+    const nextOut = path.join(outDir, `join-${i}.mp4`)
+    if (!transition || transition.type === 'cut' || transition.durationSec <= 0) {
+      await concatPair(current, files[i], nextOut)
+      currentDuration += shots[i].durationSec
+    } else {
+      const offset = Math.max(0, currentDuration - transition.durationSec)
+      await run('ffmpeg', [
+        '-y', '-i', current, '-i', files[i],
+        '-filter_complex', `[0:v][1:v]xfade=transition=${transition.ffmpeg}:duration=${transition.durationSec}:offset=${offset.toFixed(3)}[v]`,
+        '-map', '[v]',
+        '-c:v', 'libx264', '-preset', 'veryfast', '-pix_fmt', 'yuv420p', '-r', String(edit.fps),
+        nextOut,
+      ])
+      currentDuration = offset + shots[i].durationSec
+    }
+    current = nextOut
+    await progress(outDir, `joined ${i}/${files.length - 1} (${transition?.type || 'cut'})`)
   }
-  const args = ['-y']
-  for (const file of files) args.push('-i', file)
-  let offset = durations[0] - trans
-  let filter = `[0:v][1:v]xfade=transition=fade:duration=${trans}:offset=${offset.toFixed(3)}[x1]`
-  for (let i = 2; i < files.length; i++) {
-    offset += durations[i - 1] - trans
-    filter += `;[x${i - 1}][${i}:v]xfade=transition=fade:duration=${trans}:offset=${offset.toFixed(3)}[x${i}]`
-  }
-  args.push('-filter_complex', filter, '-map', `[x${files.length - 1}]`, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', String(edit.fps), out)
-  await run('ffmpeg', args)
+  await copyFile(current, out)
+}
+
+async function concatPair(a, b, out) {
+  const list = `file '${a.replace(/'/g, "'\\''")}'\nfile '${b.replace(/'/g, "'\\''")}'\n`
+  const listPath = `${out}.txt`
+  await writeFile(listPath, list)
+  await run('ffmpeg', ['-y', '-f', 'concat', '-safe', '0', '-i', listPath, '-c', 'copy', out])
+}
+
+function cropFocus(crop) {
+  if (!crop) return { x: '(in_w-out_w)/2', y: '(in_h-out_h)/2' }
+  const x = Number.isFinite(crop.x) ? Math.min(1, Math.max(0, crop.x)) : 0.5
+  const y = Number.isFinite(crop.y) ? Math.min(1, Math.max(0, crop.y)) : 0.5
+  return { x: `(in_w-out_w)*${x}`, y: `(in_h-out_h)*${y}` }
+}
+
+function safe(id) {
+  return String(id || 'scene').replace(/[^A-Za-z0-9_-]/g, '_')
+}
+
+async function progress(outDir, message) {
+  console.log(message)
+  await writeFile(path.join(outDir, 'progress.txt'), `${message}\n`).catch(() => {})
 }
 
 async function burnSubtitles(video, assPath, out) {

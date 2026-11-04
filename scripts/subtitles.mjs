@@ -128,7 +128,7 @@ export function sceneWindows(shots, transitionSec = 0) {
       end: start + duration,
       duration,
     })
-    start += duration - (index < shots.length - 1 ? transitionSec : 0)
+    start += duration - (index < shots.length - 1 ? overlapOf(shot, transitionSec) : 0)
   })
   const total = windows.length ? windows[windows.length - 1].end : 0
   return { windows, total }
@@ -329,6 +329,11 @@ function positive(value, fallback) {
 
 function numberOrNull(value) {
   return Number.isFinite(value) ? value : null
+}
+
+function overlapOf(shot, fallback) {
+  const n = Number(shot?.transition?.durationSec)
+  return Number.isFinite(n) ? n : fallback
 }
 
 function round3(n) {

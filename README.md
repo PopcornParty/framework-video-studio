@@ -60,7 +60,22 @@ Optional DNA fields extend v1 without breaking older packages.
 - The report records the music source, licence, attribution, volume, and measured loudness.
 - `visuals[].durationSec` and `visuals[].motion` control pacing. Images are covered to 1080x1920, with a short fade and subtle movement.
 
-Older DNA with only licensed visuals still renders, using four-second scenes and no music.
+## Scenes and transitions
+
+A production can contain a `scenes` array. Each scene chooses a visual, a duration from 0.5 to 30 seconds, motion, and the transition into the next scene.
+
+Practical cloud limits, not unlimited capacity:
+
+- 120 scenes
+- 180 seconds total
+- 80MB per uploaded library file
+- library warning above 500MB
+
+Old DNA without `scenes` still renders. Its default join is a simple fade. Advanced transitions are used only when a scene or preset requests them.
+
+Implemented transitions: `cut`, `fade`, `wipe-left`, `wipe-right`, `wipe-up`, `wipe-down`, `whip-left`, `whip-right`, `zoom`, `zoom-blur`, `glitch`, `flash`, `film-burn`, and `light-leak`. An unknown type fails the job. Nothing is substituted.
+
+Optional presets (`minimal`, `documentary`, `cinematic`, `fast-social`, `gaming`, `luxury`, `high-energy`) only fill transitions you did not set.
 
 ## Tech
 

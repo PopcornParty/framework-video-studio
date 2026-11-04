@@ -156,8 +156,8 @@ describe('renderer upgrade', () => {
       script: { lines: [{ id: 'L1', text: 'Second scene.', sceneId: 'VIS-2' }] },
     }
     const plan = planJob(dna)
-    const { cues } = buildCues(dna, plan.shots, plan.edit.transitionSec)
-    expect(cues[0].start).toBeGreaterThanOrEqual(4 - plan.edit.transitionSec)
+    const { cues } = buildCues(dna, plan.shots, 0)
+    expect(cues[0].start).toBeGreaterThanOrEqual(4 - plan.shots[0].transition.durationSec)
     const off = buildCues({ ...dna, subtitles: { enabled: false } }, plan.shots, 0)
     expect(off.cues).toEqual([])
   })

@@ -108,6 +108,10 @@ interface FrameworkDB extends DBSchema {
     value: Asset
     indexes: { 'by-approved': boolean }
   }
+  assetFiles: {
+    key: string
+    value: { id: string; blob: Blob }
+  }
   productions: {
     key: string
     value: Production
@@ -126,7 +130,7 @@ let dbPromise: Promise<IDBPDatabase<FrameworkDB>> | null = null
 
 export function getDB() {
   if (!dbPromise) {
-    dbPromise = openDB<FrameworkDB>('framework-video-studio', 2, {
+    dbPromise = openDB<FrameworkDB>('framework-video-studio', 3, {
       upgrade(db, oldVersion) {
         if (oldVersion < 1) {
           const assetStore = db.createObjectStore('assets', { keyPath: 'id' })
@@ -138,6 +142,9 @@ export function getDB() {
           if (!db.objectStoreNames.contains('tags')) {
             db.createObjectStore('tags', { keyPath: 'name' })
           }
+        }
+        if (oldVersion < 3 && !db.objectStoreNames.contains('assetFiles')) {
+          db.createObjectStore('assetFiles', { keyPath: 'id' })
         }
       },
     })
@@ -169,15 +176,37 @@ export async function getNextProductionId(): Promise<string> {
 
 export async function saveAsset(asset: Asset): Promise<void> {
   const db = await getDB()
-  await db.put('assets', asset)
+  const { fileBlob, ...rest } = asset
+  if (fileBlob) await db.put('assetFiles', { id: asset.id, blob: fileBlob })
+  await db.put('assets', rest as Asset)
   for (const kw of asset.keywords) {
     await upsertTag(kw)
   }
 }
 
+export async function getAssetFile(id: string): Promise<Blob | undefined> {
+  const db = await getDB()
+  const stored = await db.get('assetFiles', id)
+  if (stored?.blob) return stored.blob
+  const asset = await db.get('assets', id)
+  return asset?.fileBlob
+}
+
 export async function getAllAssets(): Promise<Asset[]> {
   const db = await getDB()
-  return db.getAll('assets')
+  const assets = await db.getAll('assets')
+  const light: Asset[] = []
+  for (const asset of assets) {
+    if (asset.fileBlob) {
+      await db.put('assetFiles', { id: asset.id, blob: asset.fileBlob })
+      const { fileBlob, ...rest } = asset
+      await db.put('assets', rest as Asset)
+      light.push(rest as Asset)
+    } else {
+      light.push(asset)
+    }
+  }
+  return light
 }
 
 export async function getApprovedAssets(): Promise<Asset[]> {

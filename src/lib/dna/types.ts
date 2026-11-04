@@ -48,6 +48,23 @@ export interface DnaClaim {
   factIds: string[]
 }
 
+export interface DnaScene {
+  id: string
+  visualId: string
+  startSec?: number
+  durationSec?: number
+  motion?: 'zoom-in' | 'pan-left' | 'pan-right' | 'none'
+  speed?: number
+  crop?: { x?: number; y?: number }
+  text?: string
+  transitionOut?: {
+    type: string
+    durationSec?: number
+    direction?: string
+    intensity?: number
+  }
+}
+
 export interface DnaVisual {
   id: string
   origin: AssetOrigin
@@ -91,7 +108,7 @@ export interface DnaPackage {
     lines?: { id: string; text: string; claims?: DnaClaim[] }[]
   }
   claims?: DnaClaim[]
-  scenes?: unknown[]
+  scenes?: DnaScene[]
   visuals?: DnaVisual[]
   [key: string]: unknown
 }

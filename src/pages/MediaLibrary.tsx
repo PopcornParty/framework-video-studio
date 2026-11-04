@@ -14,7 +14,35 @@ import {
 import { parseTags, suggestTags, normalizeTag } from '../lib/tags'
 import { extractMetadata } from '../lib/metadata'
 
+const ACCEPTED = new Set([
+  'image/jpeg', 'image/png', 'image/webp', 'image/gif',
+  'video/mp4', 'video/quicktime', 'video/webm',
+])
+const MAX_FILE_BYTES = 80 * 1024 * 1024
+const LIBRARY_WARNING_BYTES = 500 * 1024 * 1024
+
+function fileError(file: File): string | null {
+  const type = file.type || guessType(file.name)
+  if (!ACCEPTED.has(type)) return `${file.name}: unsupported type. Use JPEG, PNG, WebP, GIF, MP4, MOV, or WebM.`
+  if (file.size > MAX_FILE_BYTES) return `${file.name}: ${Math.round(file.size / 1024 / 1024)}MB is over the ${MAX_FILE_BYTES / 1024 / 1024}MB file limit.`
+  if (file.size === 0) return `${file.name}: file is empty.`
+  return null
+}
+
+function guessType(name: string) {
+  const ext = name.split('.').pop()?.toLowerCase()
+  return {
+    jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif',
+    mp4: 'video/mp4', mov: 'video/quicktime', webm: 'video/webm',
+  }[ext || ''] || ''
+}
+
 interface UploadItem {
+  file: File
+  status: 'pending' | 'uploading' | 'done' | 'error'
+  error?: string
+  progress: number
+}
   file: File
   status: 'pending' | 'uploading' | 'done' | 'error'
   error?: string
@@ -97,15 +125,21 @@ export default function MediaLibrary() {
       file: f,
       status: 'pending',
       progress: 0,
+      error: fileError(f) || undefined,
     }))
     setUploads(items)
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i]
-      setUploads(prev => prev.map((u, idx) => idx === i ? { ...u, status: 'uploading', progress: 10 } : u))
+      if (item.error) {
+        setUploads(prev => prev.map((u, idx) => idx === i ? { ...u, status: 'error', progress: 0 } : u))
+        continue
+      }
+      setUploads(prev => prev.map((u, idx) => idx === i ? { ...u, status: 'uploading', progress: 15 } : u))
       try {
         const id = await getNextAssetId()
         const meta = await extractMetadata(item.file)
+        if (!meta.width || !meta.height) throw new Error(`${item.file.name}: could not read the file. It may be corrupted.`)
         const thumbnail = await generateThumbnail(item.file)
         const suggested = parseTags(item.file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' '))
         const asset: Asset = {
@@ -214,6 +248,10 @@ export default function MediaLibrary() {
           <Upload size={16} />
           Upload
         </button>
+      </div>
+      <p className="text-xs text-gray-400">
+        Upload many images or clips at once. Each file must be JPEG, PNG, WebP, GIF, MP4, MOV, or WebM, and no larger than 80MB. The library warns above 500MB. Assets stay in this browser. Nothing is discarded without an error.
+      </p>
         <input
           ref={fileInputRef}
           type="file"
