@@ -1,0 +1,242 @@
+{
+  "schema": "framework-dna",
+  "schemaVersion": 1,
+  "request": {
+    "title": "NIGHTMARE KING GRIMM",
+    "format": "YouTube Short",
+    "creativeDirection": "Cinematic Hollow Knight boss portrait edit. Deep crimson, black shadows, glowing embers, dramatic close-ups, no gameplay HUD, no menus, no player character, no commentary, no AI voice.",
+    "durationSec": 15,
+    "aspectRatio": "9:16"
+  },
+  "research": {
+    "subject": "Nightmare King Grimm from Hollow Knight: The Grimm Troupe",
+    "visualRules": [
+      "Only use the exact Nightmare King Grimm or his recognisable boss arena shown in each named source.",
+      "No HUD, health bars, geo counter, menus, player character, other bosses, unrelated characters, or fan art.",
+      "Use cinematic centre-focused crops; keep Grimm visible."
+    ]
+  },
+  "storytelling": {
+    "style": "cinematic",
+    "structure": "ominous reveal, character reveal, escalating attacks, final portrait",
+    "pacing": "deliberate opening followed by faster dramatic cuts and a final held shot",
+    "voiceover": false
+  },
+  "visuals": [
+    {
+      "id": "grimm_01",
+      "origin": "external",
+      "depicts": "Nightmare King Grimm hovering in the crimson-lit nightmare arena beside a towering flame",
+      "durationSec": 2,
+      "motion": "zoom-in",
+      "obtain": {
+        "url": "https://static.wikia.nocookie.net/hollowknight/images/9/98/Screenshot_HK_Nightmare_King_Grimm_01.png/revision/latest/scale-to-width-down/1200?cb=20200125132506",
+        "licence": "Team Cherry FAQ video-content licence for game owners: use of Hollow Knight game content in original media; monetisation permitted. Original screenshot artwork/game content \u00a9 Team Cherry.",
+        "commercialUse": "permitted for original video content by game owners under Team Cherry FAQ",
+        "attribution": "Hollow Knight game screenshot \u00a9 Team Cherry; source: Hollow Knight Wiki, Screenshot HK Nightmare King Grimm 01."
+      }
+    },
+    {
+      "id": "grimm_02",
+      "origin": "external",
+      "depicts": "Nightmare King Grimm spreading his cloak and wings beside a vertical flame",
+      "durationSec": 2,
+      "motion": "pan-left",
+      "obtain": {
+        "url": "https://cdn.wikimg.net/en/hkwiki/images/thumb/4/49/Screenshot_HK_Nightmare_King_Grimm_02.png/1200px-Screenshot_HK_Nightmare_King_Grimm_02.png",
+        "licence": "Team Cherry FAQ video-content licence for game owners: use of Hollow Knight game content in original media; monetisation permitted. Original screenshot artwork/game content \u00a9 Team Cherry.",
+        "commercialUse": "permitted for original video content by game owners under Team Cherry FAQ",
+        "attribution": "Hollow Knight game screenshot \u00a9 Team Cherry; source: Hollow Knight Wiki, Screenshot HK Nightmare King Grimm 02."
+      }
+    },
+    {
+      "id": "grimm_04",
+      "origin": "external",
+      "depicts": "Nightmare King Grimm arena with tall red cloak spikes rising from the floor; atmospheric arena shot, no other character",
+      "durationSec": 2,
+      "motion": "zoom-in",
+      "obtain": {
+        "url": "https://huiji-public.huijistatic.com/hkss/uploads/f/f4/Screenshot_HK_Nightmare_King_Grimm_04.png",
+        "licence": "Team Cherry FAQ video-content licence for game owners: use of Hollow Knight game content in original media; monetisation permitted. Original screenshot artwork/game content \u00a9 Team Cherry.",
+        "commercialUse": "permitted for original video content by game owners under Team Cherry FAQ",
+        "attribution": "Hollow Knight game screenshot \u00a9 Team Cherry; source: Hollow Knight Chinese Wiki, Screenshot HK Nightmare King Grimm 04."
+      }
+    },
+    {
+      "id": "grimm_05",
+      "origin": "external",
+      "depicts": "Official Nightmare King Grimm sprite: red cloak, long horns and white mask, not Troupe Master Grimm",
+      "durationSec": 2,
+      "motion": "pan-right",
+      "obtain": {
+        "url": "https://cdn.wikimg.net/en/hkwiki/images/0/09/B_Nightmare_King.png",
+        "licence": "Team Cherry FAQ video-content licence for game owners: use of Hollow Knight game content in original media; monetisation permitted. Official Nightmare King Grimm sprite \u00a9 Team Cherry.",
+        "commercialUse": "permitted for original video content by game owners under Team Cherry FAQ",
+        "attribution": "Official Nightmare King Grimm sprite \u00a9 Team Cherry. Source: Hollow Knight Wiki, File:B Nightmare King.png.",
+        "source": "https://hollowknight.wiki/w/File:B_Nightmare_King.png"
+      }
+    },
+    {
+      "id": "grimm_06",
+      "origin": "external",
+      "depicts": "Nightmare King Grimm in his round pufferfish attack form surrounded by red embers",
+      "durationSec": 2,
+      "motion": "zoom-in",
+      "obtain": {
+        "url": "https://huiji-public.huijistatic.com/hkss/uploads/1/10/Screenshot_HK_Nightmare_King_Grimm_06.png",
+        "licence": "Team Cherry FAQ video-content licence for game owners: use of Hollow Knight game content in original media; monetisation permitted. Original screenshot artwork/game content \u00a9 Team Cherry.",
+        "commercialUse": "permitted for original video content by game owners under Team Cherry FAQ",
+        "attribution": "Hollow Knight game screenshot \u00a9 Team Cherry; source: Hollow Knight Chinese Wiki, Screenshot HK Nightmare King Grimm 06."
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "SC01",
+      "visualId": "grimm_01",
+      "durationSec": 1.8,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.48
+      },
+      "transitionOut": {
+        "type": "fade",
+        "durationSec": 0.25
+      }
+    },
+    {
+      "id": "SC02",
+      "visualId": "grimm_02",
+      "durationSec": 1.9,
+      "motion": "pan-left",
+      "crop": {
+        "x": 0.64,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC03",
+      "visualId": "grimm_05",
+      "durationSec": 1.9,
+      "motion": "pan-right",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "whip-right",
+        "durationSec": 0.25
+      }
+    },
+    {
+      "id": "SC04",
+      "visualId": "grimm_04",
+      "durationSec": 1.9,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "flash",
+        "durationSec": 0.15
+      }
+    },
+    {
+      "id": "SC05",
+      "visualId": "grimm_06",
+      "durationSec": 1.9,
+      "motion": "zoom-in",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    },
+    {
+      "id": "SC06",
+      "visualId": "grimm_02",
+      "durationSec": 1.9,
+      "motion": "pan-right",
+      "crop": {
+        "x": 0.64,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "zoom-blur",
+        "durationSec": 0.2
+      }
+    },
+    {
+      "id": "SC07",
+      "visualId": "grimm_05",
+      "durationSec": 2.0,
+      "motion": "pan-left",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "transitionOut": {
+        "type": "fade",
+        "durationSec": 0.15
+      }
+    },
+    {
+      "id": "SC08",
+      "visualId": "grimm_01",
+      "durationSec": 2.7,
+      "motion": "none",
+      "crop": {
+        "x": 0.5,
+        "y": 0.48
+      },
+      "transitionOut": {
+        "type": "cut"
+      }
+    }
+  ],
+  "script": {
+    "lines": []
+  },
+  "subtitles": {
+    "enabled": false
+  },
+  "music": {
+    "enabled": false
+  },
+  "edit": {
+    "preset": "cinematic",
+    "transition": "cut"
+  },
+  "timing": {
+    "durationSec": 15,
+    "fps": 30,
+    "width": 1080,
+    "height": 1920
+  },
+  "render": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "codec": "h264",
+    "pixelFormat": "yuv420p"
+  },
+  "quality": {
+    "verifyWith": "ffprobe",
+    "requireExactDurationSec": 15,
+    "noFakeAssets": true,
+    "noSilentSubstitution": true
+  },
+  "requirements": [
+    "Keep the edit cinematic and visually focused on Nightmare King Grimm.",
+    "No HUD, health bars, Geo counter, menus, player character, or unrelated characters.",
+    "No subtitles, captions, text overlays, voiceover, or generated audio.",
+    "Do not replace a failed or missing asset with another image; fail with the scene ID and URL."
+  ]
+}
